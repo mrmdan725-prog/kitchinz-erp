@@ -1,0 +1,356 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+import {
+  BarChart3,
+  Users,
+  ShoppingCart,
+  Package,
+  FileText,
+  Settings,
+  LogOut,
+  DollarSign,
+  UsersRound,
+  Receipt,
+  Eye,
+  ClipboardCheck,
+  Search,
+  Command,
+  ArrowRight,
+  Truck
+} from 'lucide-react';
+import logoImg from './assets/kitchinz_logo_v4.png';
+import { AppProvider, useApp } from './context/AppContext';
+import './App.css';
+
+// Screens
+import Customers from './screens/Customers';
+import Purchasing from './screens/Purchasing';
+import Inventory from './screens/Inventory';
+import Contracts from './screens/Contracts';
+import Dashboard from './screens/Dashboard';
+import SettingsScreen from './screens/Settings';
+import Login from './screens/Login';
+import Finance from './screens/Finance';
+import Employees from './screens/Employees';
+import Invoices from './screens/Invoices';
+import InvoiceDetails from './screens/InvoiceDetails';
+import Inspections from './screens/Inspections';
+import InspectionDetails from './screens/InspectionDetails';
+import UserProfile from './screens/UserProfile';
+import Deliveries from './screens/Deliveries';
+
+const Logo = () => (
+  <div className="logo-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative' }}>
+    <svg style={{ position: 'absolute', width: 0, height: 0 }}>
+      <filter id="perfect-transparent">
+        {/* Precise mask: removes background while keeping green and white sharp */}
+        <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  3 3 3 0 -0.8" />
+      </filter>
+    </svg>
+    <img src={logoImg} alt="KITCHINZ Logo" className="sidebar-logo-img" style={{ filter: 'url(#perfect-transparent)' }} />
+  </div>
+);
+
+const NavItem = ({ to, icon: Icon, label, isCollapsed }) => {
+  const location = useLocation();
+  const isActive = location.pathname === to;
+  return (
+    <Link to={to} className={`nav-item ${isActive ? 'active' : ''}`} title={isCollapsed ? label : ''}>
+      <Icon size={20} />
+      {!isCollapsed && <span>{label}</span>}
+    </Link>
+  );
+};
+
+const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
+  const { logout, currentUser } = useApp();
+  const perms = currentUser?.permissions || {};
+
+  return (
+    <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+      <div className="sidebar-header" onClick={() => setIsCollapsed(!isCollapsed)} style={{ cursor: 'pointer' }}>
+        <Logo />
+      </div>
+      <nav className="sidebar-nav">
+        {perms.canViewDashboard && <NavItem to="/" icon={BarChart3} label="لوحة التحكم" isCollapsed={isCollapsed} />}
+        {perms.canManageCustomers && <NavItem to="/customers" icon={Users} label="العملاء" isCollapsed={isCollapsed} />}
+        {perms.canManagePurchases && <NavItem to="/purchasing" icon={ShoppingCart} label="المشتريات" isCollapsed={isCollapsed} />}
+        {perms.canManageInventory && <NavItem to="/inventory" icon={Package} label="المخزون" isCollapsed={isCollapsed} />}
+        {perms.canManageContracts && <NavItem to="/contracts" icon={FileText} label="العقود" isCollapsed={isCollapsed} />}
+        {perms.canManageFinance && <NavItem to="/finance" icon={DollarSign} label="المالية" isCollapsed={isCollapsed} />}
+        {perms.canManageInspections && <NavItem to="/inspections" icon={Eye} label="المعاينات" isCollapsed={isCollapsed} />}
+        {perms.canManageDeliveries && <NavItem to="/deliveries" icon={Truck} label="التسليمات" isCollapsed={isCollapsed} />}
+        {perms.canManageInvoices && <NavItem to="/invoices" icon={Receipt} label="الفواتير" isCollapsed={isCollapsed} />}
+        {perms.canManageHR && <NavItem to="/employees" icon={UsersRound} label="الموظفين" isCollapsed={isCollapsed} />}
+      </nav>
+      <div className="sidebar-footer">
+        {perms.canManageUsers && <NavItem to="/settings" icon={Settings} label="الإعدادات" isCollapsed={isCollapsed} />}
+      </div>
+    </aside>
+  );
+};
+
+const AppContent = () => {
+  const { currentUser, customers, contracts, invoices, logout, isCloudLoading } = useApp();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [globalSearch, setGlobalSearch] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const location = useLocation();
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (!globalSearch.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const query = globalSearch.toLowerCase();
+    const results = [
+      ...customers.filter(c => c.name?.toLowerCase().includes(query)).map(c => ({ ...c, type: 'customer', link: '/customers' })),
+      ...contracts.filter(c => c.customer?.name?.toLowerCase().includes(query) || c.projectType?.toLowerCase().includes(query)).map(c => ({ ...c, type: 'contract', link: '/contracts' })),
+      ...invoices.filter(c => c.customerName?.toLowerCase().includes(query) || c.invoiceNo?.toLowerCase().includes(query)).map(c => ({ ...c, type: 'invoice', link: `/invoice/${c.id}` }))
+    ].slice(0, 8);
+
+    setSearchResults(results);
+  }, [globalSearch, customers, contracts, invoices]);
+
+  // Keyboard shortcut (CMD+K or CTRL+K)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        document.querySelector('.search-box-wrapper input')?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Close user menu on click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Close search results and user menu on navigation
+  useEffect(() => {
+    setGlobalSearch('');
+    setIsUserMenuOpen(false);
+  }, [location.pathname]);
+
+  if (isCloudLoading) {
+    return (
+      <div style={{
+        height: '100vh',
+        width: '100vw',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#0f172a',
+        gap: '24px'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <img src={logoImg} alt="KITCHINZ" style={{ height: '80px', marginBottom: '20px', filter: 'url(#perfect-transparent)' }} />
+          <div style={{ color: '#44b85c', fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="sync-spinner"></div>
+            جاري مزامنة البيانات مع السحاب...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return <Login />;
+  }
+
+  const perms = currentUser.permissions || {};
+
+  const ProtectedRoute = ({ children, perm }) => {
+    if (perm !== undefined && !perm) {
+      return (
+        <div style={{ textAlign: 'center', marginTop: '100px' }}>
+          <h2 style={{ color: '#ff4d4d' }}>عذراً، ليس لديك صلاحية للوصول لهذه الصفحة</h2>
+          <p>يرجى التواصل مع مدير النظام لتعديل صلاحياتك.</p>
+        </div>
+      );
+    }
+    return children;
+  };
+
+  return (
+    <div className="app-container" dir="rtl">
+      <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+      <main className="content">
+        <header className="main-header" style={{ display: 'flex', alignItems: 'center', height: '80px', padding: '0 32px', gap: '20px' }}>
+          <img src={logoImg} alt="KITCHINZ" style={{ height: '50px', width: 'auto', filter: 'url(#perfect-transparent)' }} />
+
+          <div className="intelligence-hub">
+            <div className="search-box-wrapper" style={{ position: 'relative', minWidth: '400px' }}>
+              <div className="search-box glass" style={{ marginBottom: 0, padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '12px', borderRadius: '14px' }}>
+                <Search size={18} className="text-secondary" />
+                <input
+                  type="text"
+                  placeholder="ابحث بذكاء عن عميل، عقد، أو فاتورة..."
+                  value={globalSearch}
+                  onChange={(e) => setGlobalSearch(e.target.value)}
+                  style={{ background: 'transparent', border: 'none', color: 'white', outline: 'none', width: '100%', fontSize: '14px' }}
+                />
+                <div style={{ background: 'rgba(255,255,255,0.1)', padding: '4px 8px', borderRadius: '6px', fontSize: '10px', color: 'var(--text-secondary)' }}>
+                  <Command size={10} style={{ marginLeft: '4px' }} /> K
+                </div>
+              </div>
+
+              {searchResults.length > 0 && (
+                <div className="search-results-floating glass" style={{
+                  position: 'absolute',
+                  top: '120%',
+                  left: 0,
+                  right: 0,
+                  zIndex: 200,
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '12px',
+                  maxHeight: '400px',
+                  overflowY: 'auto'
+                }}>
+                  {searchResults.map((res, i) => (
+                    <Link
+                      key={i}
+                      to={res.link}
+                      className="search-result-item"
+                      onClick={() => setGlobalSearch('')} // Clear search on click
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '12px',
+                        borderRadius: 'var(--radius-md)',
+                        textDecoration: 'none',
+                        color: 'white',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <div style={{
+                        width: '32px',
+                        height: '32px',
+                        background: 'rgba(255,255,255,0.05)',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: res.type === 'customer' ? 'var(--primary)' : res.type === 'contract' ? '#3498db' : '#e67e22'
+                      }}>
+                        {res.type === 'customer' ? <Users size={16} /> : res.type === 'contract' ? <FileText size={16} /> : <Receipt size={16} />}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '14px', fontWeight: '600' }}>{res.name || res.customerName || res.invoiceNo}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{res.type === 'customer' ? 'عميل' : res.type === 'contract' ? 'عقد' : 'فاتورة'} • {res.projectType || res.status || ''}</div>
+                      </div>
+                      <ArrowRight size={14} className="text-muted" />
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="user-profile-wrapper" style={{ position: 'relative' }} ref={menuRef}>
+              <div
+                className={`user-profile ${isUserMenuOpen ? 'active' : ''}`}
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+              >
+                <div style={{ textAlign: 'left', marginLeft: '12px' }}>
+                  <span style={{ display: 'block', fontSize: '13px', fontWeight: '700' }}>{currentUser.name}</span>
+                  <span className="text-secondary" style={{ fontSize: '10px' }}>{currentUser.role === 'admin' ? 'مدير نظام' : 'مهندس'}</span>
+                </div>
+                <div className="avatar">{currentUser.name.charAt(0)}</div>
+              </div>
+
+              {isUserMenuOpen && (
+                <div className="user-dropdown-menu glass" style={{
+                  position: 'absolute',
+                  top: '120%',
+                  left: 0,
+                  minWidth: '200px',
+                  zIndex: 200,
+                  borderRadius: 'var(--radius-md)',
+                  padding: '8px',
+                  animation: 'slideDown 0.3s ease',
+                  background: 'rgba(23, 23, 25, 0.95)'
+                }}>
+                  <div style={{ padding: '12px', borderBottom: '1px solid var(--border-glass)', marginBottom: '8px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: '600', color: 'white' }}>{currentUser.name}</div>
+                    <div style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>{currentUser.username} @ كيتشينز</div>
+                  </div>
+
+                  <Link to="/profile" className="dropdown-item" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', borderRadius: '8px', textDecoration: 'none', color: 'var(--text-secondary)', transition: 'all 0.2s' }}>
+                    <Settings size={16} />
+                    <span style={{ fontSize: '13px' }}>إعدادات الحساب</span>
+                  </Link>
+
+                  <button
+                    onClick={logout}
+                    className="dropdown-item logout-nav"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '10px',
+                      borderRadius: '8px',
+                      width: '100%',
+                      border: 'none',
+                      background: 'transparent',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      marginTop: '4px'
+                    }}
+                  >
+                    <LogOut size={16} />
+                    <span style={{ fontSize: '13px' }}>تسجيل الخروج</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
+
+        <div className="page-container">
+          <Routes>
+            <Route path="/" element={<ProtectedRoute perm={perms.canViewDashboard}><Dashboard /></ProtectedRoute>} />
+            <Route path="/customers" element={<ProtectedRoute perm={perms.canManageCustomers}><Customers /></ProtectedRoute>} />
+            <Route path="/purchasing" element={<ProtectedRoute perm={perms.canManagePurchases}><Purchasing /></ProtectedRoute>} />
+            <Route path="/inventory" element={<ProtectedRoute perm={perms.canManageInventory}><Inventory /></ProtectedRoute>} />
+            <Route path="/contracts" element={<ProtectedRoute perm={perms.canManageContracts}><Contracts /></ProtectedRoute>} />
+            <Route path="/deliveries" element={<ProtectedRoute perm={perms.canManageDeliveries}><Deliveries /></ProtectedRoute>} />
+            <Route path="/finance" element={<ProtectedRoute perm={perms.canManageFinance}><Finance /></ProtectedRoute>} />
+            <Route path="/invoices" element={<ProtectedRoute perm={perms.canManageInvoices}><Invoices /></ProtectedRoute>} />
+            <Route path="/invoice/:id" element={<ProtectedRoute perm={perms.canManageInvoices}><InvoiceDetails /></ProtectedRoute>} />
+            <Route path="/inspections" element={<ProtectedRoute perm={perms.canManageInspections}><Inspections /></ProtectedRoute>} />
+            <Route path="/inspection/:id" element={<ProtectedRoute perm={perms.canManageInspections}><InspectionDetails /></ProtectedRoute>} />
+            <Route path="/employees" element={<ProtectedRoute perm={perms.canManageHR}><Employees /></ProtectedRoute>} />
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/settings" element={<ProtectedRoute perm={perms.canManageUsers}><SettingsScreen /></ProtectedRoute>} />
+          </Routes>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+const App = () => {
+  return (
+    <AppProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </AppProvider>
+  );
+};
+
+export default App;

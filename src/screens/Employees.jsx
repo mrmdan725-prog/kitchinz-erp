@@ -1,0 +1,550 @@
+import React, { useState } from 'react';
+import { useApp } from '../context/AppContext';
+import {
+    UsersRound,
+    Plus,
+    Search,
+    Edit,
+    Trash2,
+    Wallet,
+    Calendar,
+    Banknote,
+    BadgeCheck,
+    Briefcase,
+    CheckSquare,
+    Square,
+    HandCoins,
+    CircleDollarSign,
+    CheckCircle2,
+    Circle
+} from 'lucide-react';
+
+const Employees = () => {
+    const { employees, addEmployee, updateEmployee, deleteEmployee, paySalary, accounts } = useApp();
+    const [showModal, setShowModal] = useState(false);
+    const [showPayModal, setShowPayModal] = useState(false);
+    const [editMode, setEditMode] = useState(false);
+    const [selectedEmployee, setSelectedEmployee] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [showBulkModal, setShowBulkModal] = useState(false);
+    const [selectedForBulk, setSelectedForBulk] = useState([]);
+
+    const [newEmployee, setNewEmployee] = useState({
+        name: '',
+        role: '',
+        baseSalary: '',
+        joinDate: new Date().toISOString().split('T')[0]
+    });
+
+    const [payData, setPayData] = useState({
+        amount: '',
+        account: accounts[0]?.name || 'الخزنة الرئيسية'
+    });
+
+    const filteredEmployees = employees.filter(emp =>
+        emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        emp.role.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const totalSalaries = employees.reduce((sum, emp) => sum + Number(emp.baseSalary), 0);
+
+    const handleEmployeeSubmit = (e) => {
+        e.preventDefault();
+        if (editMode && selectedEmployee) {
+            updateEmployee({ ...selectedEmployee, ...newEmployee });
+        } else {
+            addEmployee(newEmployee);
+        }
+        closeModal();
+    };
+
+    const handlePaySalary = (e) => {
+        e.preventDefault();
+        if (selectedEmployee) {
+            paySalary(selectedEmployee.id, payData.amount, payData.account);
+            setShowPayModal(false);
+            setSelectedEmployee(null);
+            setPayData({ amount: '', account: accounts[0]?.name || 'الخزنة الرئيسية' });
+        }
+    };
+
+    const handleBulkPay = (e) => {
+        e.preventDefault();
+        if (selectedForBulk.length === 0) {
+            alert('يرجى اختيار موظف واحد على الأقل.');
+            return;
+        }
+
+        if (window.confirm(`هل أنت متأكد من صرف الرواتب لـ ${selectedForBulk.length} موظف؟`)) {
+            selectedForBulk.forEach(empId => {
+                const emp = employees.find(e => e.id === empId);
+                if (emp) {
+                    paySalary(emp.id, emp.baseSalary, payData.account);
+                }
+            });
+            setShowBulkModal(false);
+            setSelectedForBulk([]);
+            alert('تم صرف الرواتب للموظفين المحددين بنجاح.');
+        }
+    };
+
+    const toggleBulkSelect = (id) => {
+        setSelectedForBulk(prev =>
+            prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+        );
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedForBulk.length === filteredEmployees.length) {
+            setSelectedForBulk([]);
+        } else {
+            setSelectedForBulk(filteredEmployees.map(emp => emp.id));
+        }
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+        setEditMode(false);
+        setSelectedEmployee(null);
+        setNewEmployee({
+            name: '',
+            role: '',
+            baseSalary: '',
+            joinDate: new Date().toISOString().split('T')[0]
+        });
+    };
+
+    const startEdit = (emp) => {
+        setSelectedEmployee(emp);
+        setNewEmployee({
+            name: emp.name,
+            role: emp.role,
+            baseSalary: emp.baseSalary,
+            joinDate: emp.joinDate
+        });
+        setEditMode(true);
+        setShowModal(true);
+    };
+
+    const startPay = (emp) => {
+        setSelectedEmployee(emp);
+        setPayData({ ...payData, amount: emp.baseSalary });
+        setShowPayModal(true);
+    };
+
+    return (
+        <div className="page dashboard-fade-in">
+            <div className="page-header">
+                <div>
+                    <h2>إدارة شؤون الموظفين</h2>
+                    <p className="text-secondary">إدارة بيانات الفريق، الرواتب والمهام الوظيفية</p>
+                </div>
+                <div className="flex gap-2">
+                    <button className="btn-secondary" onClick={() => {
+                        setSelectedForBulk([]);
+                        setShowBulkModal(true);
+                    }}>
+                        <div className="bulk-pay-icon-wrapper">
+                            <CircleDollarSign size={18} />
+                        </div>
+                        <span>صرف جماعي</span>
+                    </button>
+                    <button className="btn-primary" onClick={() => setShowModal(true)}>
+                        <Plus size={20} />
+                        <span>إضافة موظف جديد</span>
+                    </button>
+                </div>
+            </div>
+
+            <div className="stats-grid">
+                <div className="stat-card">
+                    <div className="icon-box" style={{ background: 'rgba(var(--primary-rgb), 0.1)', color: 'var(--primary)' }}>
+                        <UsersRound size={24} />
+                    </div>
+                    <div className="stat-info">
+                        <span className="stat-label">إجمالي الفريق</span>
+                        <span className="stat-value">{employees.length} موظف</span>
+                    </div>
+                </div>
+                <div className="stat-card">
+                    <div className="icon-box" style={{ background: 'rgba(70, 174, 76, 0.1)', color: '#46ae4c' }}>
+                        <Banknote size={24} />
+                    </div>
+                    <div className="stat-info">
+                        <span className="stat-label">كتلة الرواتب</span>
+                        <span className="stat-value">{totalSalaries.toLocaleString()} ج.م</span>
+                    </div>
+                </div>
+                <div className="stat-card">
+                    <div className="icon-box" style={{ background: 'rgba(255, 152, 0, 0.1)', color: '#ff9800' }}>
+                        <Calendar size={24} />
+                    </div>
+                    <div className="stat-info">
+                        <span className="stat-label">تاريخ اليوم</span>
+                        <span className="stat-value">{new Date().toLocaleDateString('ar-EG')}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="table-container" style={{ marginTop: '32px' }}>
+                <div className="table-header-tools">
+                    <div className="search-bar" style={{ margin: 0, border: 'none', background: 'transparent' }}>
+                        <Search size={18} className="text-secondary" />
+                        <input
+                            placeholder="بحث عن موظف..."
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                </div>
+                <table className="data-table">
+                    <thead>
+                        <tr>
+                            <th>الموظف</th>
+                            <th>الوظيفة</th>
+                            <th>الراتب الأساسي</th>
+                            <th>تاريخ التعاقد</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredEmployees.map(emp => (
+                            <tr key={emp.id}>
+                                <td>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <div className="user-avatar" style={{ width: '36px', height: '36px', fontSize: '14px' }}>
+                                            {emp.name.charAt(0)}
+                                        </div>
+                                        <div style={{ fontWeight: '600' }}>{emp.name}</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span className="role-badge">
+                                        <Briefcase size={12} />
+                                        {emp.role}
+                                    </span>
+                                </td>
+                                <td style={{ fontWeight: '700', color: 'var(--primary)' }}>{Number(emp.baseSalary).toLocaleString()} ج.م</td>
+                                <td>
+                                    <div className="date-info">
+                                        <Calendar size={14} className="text-secondary" />
+                                        {new Date(emp.joinDate).toLocaleDateString('ar-EG')}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div className="table-actions">
+                                        <button className="btn-action-primary" onClick={() => startPay(emp)} title="صرف الراتب">
+                                            <Wallet size={16} />
+                                            <span>صرف</span>
+                                        </button>
+                                        <button className="btn-icon" onClick={() => startEdit(emp)} title="تعديل">
+                                            <Edit size={16} />
+                                        </button>
+                                        <button
+                                            className="btn-icon text-danger"
+                                            onClick={() => {
+                                                if (window.confirm(`هل أنت متأكد من حذف الموظف "${emp.name}"؟ سيتم مسح كافة سجلاته من النظام.`)) {
+                                                    deleteEmployee(emp.id);
+                                                }
+                                            }}
+                                            title="حذف"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Add/Edit Modal */}
+            {showModal && (
+                <div className="modal-overlay">
+                    <div className="modal glass" style={{ maxWidth: '500px' }}>
+                        <h3>{editMode ? 'تعديل بيانات موظف' : 'إضافة موظف جديد للفريق'}</h3>
+                        <form onSubmit={handleEmployeeSubmit}>
+                            <div className="form-group">
+                                <label>اسم الموظف بالكامل</label>
+                                <input
+                                    required
+                                    value={newEmployee.name}
+                                    onChange={e => setNewEmployee({ ...newEmployee, name: e.target.value })}
+                                />
+                            </div>
+                            <div className="form-grid">
+                                <div className="form-group">
+                                    <label>المسمى الوظيفي</label>
+                                    <input
+                                        required
+                                        value={newEmployee.role}
+                                        onChange={e => setNewEmployee({ ...newEmployee, role: e.target.value })}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>الراتب الأساسي</label>
+                                    <input
+                                        required
+                                        type="number"
+                                        value={newEmployee.baseSalary}
+                                        onChange={e => setNewEmployee({ ...newEmployee, baseSalary: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label>تاريخ الانضمام</label>
+                                <input
+                                    type="date"
+                                    value={newEmployee.joinDate}
+                                    onChange={e => setNewEmployee({ ...newEmployee, joinDate: e.target.value })}
+                                />
+                            </div>
+                            <div className="modal-actions">
+                                <button type="button" className="btn-secondary" onClick={closeModal}>إلغاء</button>
+                                <button type="submit" className="btn-primary">{editMode ? 'حفظ التغييرات' : 'إضافة الموظف'}</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Pay Salary Modal */}
+            {showPayModal && (
+                <div className="modal-overlay">
+                    <div className="modal glass" style={{ maxWidth: '400px' }}>
+                        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                            <div className="icon-circle" style={{ background: 'rgba(70, 174, 76, 0.1)', color: '#46ae4c', margin: '0 auto 16px' }}>
+                                <Banknote size={32} />
+                            </div>
+                            <h3>تأكيد صرف راتب</h3>
+                            <p className="text-secondary">أنت على وشك صرف راتب الموظف: <br /><strong style={{ color: 'white' }}>{selectedEmployee?.name}</strong></p>
+                        </div>
+                        <form onSubmit={handlePaySalary}>
+                            <div className="form-group">
+                                <label>المبلغ المطلوب صرفه</label>
+                                <input
+                                    required
+                                    type="number"
+                                    value={payData.amount}
+                                    onChange={e => setPayData({ ...payData, amount: e.target.value })}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>الصرف من حساب</label>
+                                <select
+                                    value={payData.account}
+                                    onChange={e => setPayData({ ...payData, account: e.target.value })}
+                                >
+                                    {accounts.map(acc => (
+                                        <option key={acc.id} value={acc.name}>{acc.name} ({acc.balance.toLocaleString()} ج.م)</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="modal-actions">
+                                <button type="button" className="btn-secondary" onClick={() => setShowPayModal(false)}>إلغاء</button>
+                                <button type="submit" className="btn-primary" style={{ background: '#46ae4c' }}>تأكيد الصرف</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Bulk Pay Modal */}
+            {showBulkModal && (
+                <div className="modal-overlay">
+                    <div className="modal glass" style={{ maxWidth: '600px' }}>
+                        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                            <div className="icon-circle" style={{ background: 'rgba(var(--primary-rgb), 0.1)', color: 'var(--primary)', margin: '0 auto 16px' }}>
+                                <UsersRound size={32} />
+                            </div>
+                            <h3>صرف رواتب جماعي</h3>
+                            <p className="text-secondary">قم باختيار الموظفين المراد تحويل رواتبهم المحددة في النظام</p>
+                        </div>
+
+                        <div className="bulk-selection-container">
+                            <div className="bulk-header">
+                                <div className="perm-item" onClick={toggleSelectAll}>
+                                    <div className={`perm-checkbox ${selectedForBulk.length === filteredEmployees.length && filteredEmployees.length > 0 ? 'active' : ''}`}>
+                                        {selectedForBulk.length === filteredEmployees.length && filteredEmployees.length > 0 && <CheckCircle2 size={16} />}
+                                    </div>
+                                    <strong style={{ color: 'white' }}>تحديد الكل ({filteredEmployees.length})</strong>
+                                </div>
+                                <span className="text-secondary">{selectedForBulk.length} موظفين محددين</span>
+                            </div>
+
+                            <div className="bulk-list">
+                                {filteredEmployees.map(emp => (
+                                    <div key={emp.id} className={`bulk-emp-item ${selectedForBulk.includes(emp.id) ? 'selected' : ''}`} onClick={() => toggleBulkSelect(emp.id)}>
+                                        <div className="perm-checkbox">
+                                            {selectedForBulk.includes(emp.id) ? <CheckCircle2 size={16} /> : <Circle size={16} />}
+                                        </div>
+                                        <div className="emp-brief">
+                                            <span className="emp-name">{emp.name}</span>
+                                            <span className="emp-salary">{Number(emp.baseSalary).toLocaleString()} ج.م</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="bulk-footer" style={{ padding: '12px 16px', background: 'rgba(var(--primary-rgb), 0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-glass)' }}>
+                                <span style={{ fontSize: '14px', fontWeight: '600' }}>إجمالي المبلغ المستحق:</span>
+                                <span style={{ fontSize: '18px', fontWeight: '800', color: 'var(--primary)' }}>
+                                    {selectedForBulk.reduce((sum, id) => {
+                                        const emp = employees.find(e => e.id === id);
+                                        return sum + (Number(emp?.baseSalary) || 0);
+                                    }, 0).toLocaleString()} ج.م
+                                </span>
+                            </div>
+                        </div>
+
+                        <form onSubmit={handleBulkPay} style={{ marginTop: '20px' }}>
+                            <div className="form-group">
+                                <label>الصرف من حساب</label>
+                                <select
+                                    value={payData.account}
+                                    onChange={e => setPayData({ ...payData, account: e.target.value })}
+                                >
+                                    {accounts.map(acc => (
+                                        <option key={acc.id} value={acc.name}>{acc.name} ({acc.balance.toLocaleString()} ج.م)</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="modal-actions">
+                                <button type="button" className="btn-secondary" onClick={() => setShowBulkModal(false)}>إلغاء</button>
+                                <button type="submit" className="btn-primary" style={{ background: '#46ae4c' }} disabled={selectedForBulk.length === 0}>
+                                    تأكيد صرف {selectedForBulk.length} راتب
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            <style>{`
+                .bulk-selection-container {
+                    background: rgba(255, 255, 255, 0.03);
+                    border: 1px solid var(--border-glass);
+                    border-radius: var(--radius-md);
+                    overflow: hidden;
+                }
+                .bulk-header {
+                    padding: 12px 16px;
+                    border-bottom: 1px solid var(--border-glass);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    background: rgba(255, 255, 255, 0.02);
+                }
+                .bulk-list {
+                    max-height: 250px;
+                    overflow-y: auto;
+                }
+                .bulk-emp-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 12px 16px;
+                    border-bottom: 1px solid var(--border-glass);
+                    cursor: pointer;
+                    transition: 0.2s;
+                }
+                .bulk-emp-item:last-child {
+                    border-bottom: none;
+                }
+                .bulk-emp-item:hover {
+                    background: rgba(var(--primary-rgb), 0.05);
+                }
+                .bulk-emp-item.selected {
+                    background: rgba(var(--primary-rgb), 0.1);
+                }
+                .emp-brief {
+                    display: flex;
+                    justify-content: space-between;
+                    flex: 1;
+                    align-items: center;
+                }
+                .emp-name {
+                    font-weight: 600;
+                    font-size: 14px;
+                }
+                .emp-salary {
+                    font-size: 13px;
+                    color: var(--primary);
+                    font-weight: 700;
+                }
+                .perm-checkbox {
+                    color: var(--text-secondary);
+                }
+                .selected .perm-checkbox {
+                    color: var(--primary);
+                }
+                .bulk-pay-icon-wrapper {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 28px;
+                    height: 28px;
+                    background: rgba(var(--primary-rgb), 0.15);
+                    color: var(--primary);
+                    border-radius: 8px;
+                    transition: all 0.3s ease;
+                }
+                .btn-secondary:hover .bulk-pay-icon-wrapper {
+                    background: var(--primary);
+                    color: white;
+                    transform: scale(1.1);
+                    box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.4);
+                }
+                .role-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 4px 12px;
+                    background: rgba(255, 255, 255, 0.05);
+                    border-radius: 6px;
+                    font-size: 13px;
+                    color: var(--text-secondary);
+                }
+                .date-info {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    color: var(--text-secondary);
+                }
+                .btn-action-primary {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 6px 14px;
+                    background: rgba(70, 174, 76, 0.1);
+                    color: #46ae4c;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: 0.3s;
+                }
+                .btn-action-primary:hover {
+                    background: #46ae4c;
+                    color: white;
+                }
+                .table-actions {
+                    display: flex;
+                    gap: 12px;
+                    align-items: center;
+                }
+                .icon-circle {
+                    width: 64px;
+                    height: 64px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+            `}</style>
+        </div>
+    );
+};
+
+export default Employees;
