@@ -38,38 +38,27 @@ const Dashboard = () => {
     return (
         <div className="page arabic-text dashboard-fade-in">
             {/* Hero Section */}
-            <div className="hero-section glass" style={{
-                padding: '50px 40px',
-                borderRadius: 'var(--radius-xl)',
-                marginBottom: '40px',
-                background: 'linear-gradient(225deg, hsla(var(--primary-h), 40%, 40%, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%)',
-                border: '1px solid var(--border-glass)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                offsetInlineStart: 0,
-                position: 'relative',
-                overflow: 'hidden'
-            }}>
-                <div style={{ position: 'relative', zIndex: 2 }}>
-                    <h1 className="text-gradient" style={{ fontSize: '36px', marginBottom: '12px' }}>
+            <div className="hero-section glass dashboard-hero">
+                <div className="hero-content">
+                    <h1 className="hero-title text-gradient">
                         {new Date().getHours() < 12 ? 'صباح الخير' : 'مساء الخير'}، مدير كيتشينز ✨
                     </h1>
-                    <p className="text-secondary" style={{ fontSize: '16px', maxWidth: '500px' }}>
+                    <p className="hero-subtitle text-secondary">
                         أهلاً بك مجدداً في مركز القيادة الذكي. إليك نظرة شاملة على تطور أعمالك اليوم.
                     </p>
                 </div>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center', position: 'relative', zIndex: 2 }}>
-                    <div className="stat-badge glass" style={{ padding: '12px 24px', borderRadius: '40px', background: 'rgba(255,255,255,0.05)' }}>
-                        <ArrowUpRight size={18} style={{ color: 'var(--primary)' }} />
-                        <span style={{ fontWeight: '600' }}>أداء مرتفع (+12.5%)</span>
+                <div className="hero-actions">
+                    <div className="stat-badge glass">
+                        <ArrowUpRight size={18} className="text-primary" />
+                        <span className="badge-text">أداء مرتفع (+12.5%)</span>
                     </div>
                 </div>
                 {/* Decorative Elements */}
-                <div style={{ position: 'absolute', top: '-50px', left: '-50px', width: '200px', height: '200px', background: 'var(--primary)', filter: 'blur(100px)', opacity: 0.1 }}></div>
+                <div className="hero-decoration"></div>
             </div>
 
             {/* KPI Cards */}
-            <div className="stats-grid" style={{ marginBottom: '40px' }}>
+            <div className="stats-grid dashboard-stats">
                 <div className="dashboard-card glass">
                     <div className="icon-box" style={{ background: 'rgba(70, 174, 76, 0.15)', color: '#46ae4c' }}>
                         <Users size={24} />
@@ -115,15 +104,15 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '32px', marginBottom: '40px' }}>
+            <div className="dashboard-grid">
                 {/* Project Distribution Chart (Creative CSS) */}
-                <div className="card glass-interactive" style={{ padding: '30px', borderRadius: 'var(--radius-lg)', minHeight: '400px', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
-                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <div className="card glass-interactive dashboard-chart-card">
+                    <div className="card-header-creative">
+                        <div className="header-title-group">
                             <TrendingUp className="text-primary" size={20} />
-                            <h3 style={{ fontSize: '18px', fontWeight: '700' }}>تحليل توزيع المشروعات</h3>
+                            <h3 className="chart-title">تحليل توزيع المشروعات</h3>
                         </div>
-                        <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>آخر تحديث: الآن</span>
+                        <span className="last-update">آخر تحديث: الآن</span>
                     </div>
 
                     <div className="chart-wrapper" style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', gap: '20px', padding: '20px 0 10px' }}>
@@ -202,24 +191,17 @@ const Dashboard = () => {
                 </div>
 
                 {/* Recent Activity */}
-                <div className="card glass" style={{ padding: '30px', borderRadius: 'var(--radius-lg)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <div className="card glass dashboard-activity-card">
+                    <div className="card-header-creative">
+                        <div className="header-title-group">
                             <Clock className="text-secondary" size={20} />
-                            <h3 style={{ fontSize: '18px', fontWeight: '700' }}>النشاطات الذكية</h3>
+                            <h3 className="chart-title">النشاطات الذكية</h3>
                         </div>
-                        <button style={{ background: 'transparent', border: 'none', color: 'var(--primary)', fontSize: '12px', cursor: 'pointer', fontWeight: '600' }}>مشاهدة الكل</button>
+                        <button className="view-all-btn">مشاهدة الكل</button>
                     </div>
-                    <div className="activity-list" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div className="activity-list">
                         {recentActivities.length > 0 ? recentActivities.map((act, i) => (
-                            <div key={i} className="activity-item glass-interactive" style={{
-                                padding: '14px',
-                                borderRadius: 'var(--radius-md)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '14px',
-                                border: '1px solid rgba(255,255,255,0.03)'
-                            }}>
+                            <div key={i} className="activity-item glass-interactive">
                                 <div className="activity-icon-small" style={{
                                     background: act.type === 'contract' ? 'rgba(70, 174, 76, 0.1)' : 'rgba(52, 152, 219, 0.1)',
                                     color: act.type === 'contract' ? 'var(--primary)' : '#3498db',
@@ -227,34 +209,27 @@ const Dashboard = () => {
                                 }}>
                                     {act.type === 'contract' ? <FileText size={18} /> : <ShoppingCart size={18} />}
                                 </div>
-                                <div style={{ flex: 1 }}>
-                                    <h4 style={{ fontSize: '14px', fontWeight: '600', color: 'white' }}>{act.name}</h4>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                                        <p className="text-secondary" style={{ fontSize: '12px' }}>{act.detail}</p>
-                                        <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{act.date.toLocaleDateString('ar-EG')}</span>
+                                <div className="activity-details">
+                                    <h4 className="activity-name">{act.name}</h4>
+                                    <div className="activity-meta">
+                                        <p className="text-secondary">{act.detail}</p>
+                                        <span className="activity-date">{act.date.toLocaleDateString('ar-EG')}</span>
                                     </div>
                                 </div>
                             </div>
                         )) : (
-                            <p className="text-secondary" style={{ textAlign: 'center', padding: '20px' }}>لا توجد نشاطات مؤخراً</p>
+                            <p className="text-secondary empty-msg">لا توجد نشاطات مؤخراً</p>
                         )}
                     </div>
                 </div>
             </div>
             {/* Quick Actions (Integrated Hub) */}
-            <div className="card glass" style={{
-                padding: '32px',
-                borderRadius: 'var(--radius-xl)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '24px',
-                border: '1px dashed var(--border-glass)'
-            }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3 style={{ fontSize: '18px', fontWeight: '700' }}>اختصارات سريعة للمبدعين 🎨</h3>
-                    <p className="text-secondary" style={{ fontSize: '13px' }}>قم بإنجاز مهامك اليومية بسرعة فائقة</p>
+            <div className="card glass dashboard-hub">
+                <div className="hub-header">
+                    <h3 className="hub-title">اختصارات سريعة للمبدعين 🎨</h3>
+                    <p className="text-secondary hub-subtitle">قم بإنجاز مهامك اليومية بسرعة فائقة</p>
                 </div>
-                <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                <div className="hub-actions">
                     {[
                         { label: 'عقد جديد', icon: Plus, link: '/contracts', color: 'var(--primary)' },
                         { label: 'إضافة عميل', icon: Users, link: '/customers', color: '#3498db' },
@@ -263,12 +238,11 @@ const Dashboard = () => {
                     ].map((btn, i) => (
                         <button
                             key={i}
-                            className="quick-action-btn glass-interactive"
-                            style={{ flex: 1, minWidth: '150px', justifyContent: 'center', gap: '12px', padding: '20px', borderRadius: 'var(--radius-lg)' }}
+                            className="quick-action-btn github-style glass-interactive"
                             onClick={() => window.location.href = btn.link}
                         >
                             <btn.icon size={20} style={{ color: btn.color }} />
-                            <span style={{ fontWeight: '600' }}>{btn.label}</span>
+                            <span className="btn-label">{btn.label}</span>
                         </button>
                     ))}
                 </div>

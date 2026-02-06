@@ -249,7 +249,7 @@ const Finance = () => {
             </div>
 
             {/* Financial Stats */}
-            <div className="stats-grid">
+            <div className="stats-grid finance-stats">
                 <div className="stat-card">
                     <div className="icon-box" style={{ background: 'rgba(70, 174, 76, 0.1)', color: '#46ae4c' }}>
                         <TrendingUp size={24} />
@@ -281,10 +281,10 @@ const Finance = () => {
                 </div>
             </div>
 
-            <div className="finance-grid">
+            <div className="finance-layout-grid">
                 {/* Account Balances */}
-                <div className="card">
-                    <div className="card-header" style={{ justifyContent: 'space-between' }}>
+                <div className="card glass finance-card">
+                    <div className="card-header-creative space-between">
                         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                             <CreditCard size={20} className="text-primary" />
                             <h3>حسابات المعرض</h3>
@@ -321,8 +321,8 @@ const Finance = () => {
                 </div>
 
                 {/* Customer Accounts */}
-                <div className="card">
-                    <div className="card-header">
+                <div className="card glass finance-card">
+                    <div className="card-header-creative">
                         <Users size={20} className="text-primary" />
                         <h3>حسابات العملاء (رصيد المشاريع)</h3>
                     </div>
@@ -371,8 +371,8 @@ const Finance = () => {
                 </div>
 
                 {/* Financial Chart */}
-                <div className="card">
-                    <div className="card-header">
+                <div className="card glass finance-card">
+                    <div className="card-header-creative">
                         <PieChart size={20} className="text-primary" />
                         <h3>تحليل النفقات</h3>
                     </div>
@@ -395,11 +395,11 @@ const Finance = () => {
                 </div>
             </div>
 
-            <div className="finance-grid" style={{ marginTop: '24px' }}>
+            <div className="finance-layout-grid bottom">
                 {/* Recurring Expenses (Bills) */}
-                <div className="card">
-                    <div className="card-header" style={{ justifyContent: 'space-between' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div className="card glass finance-card">
+                    <div className="card-header-creative space-between">
+                        <div className="header-title-group">
                             <Calendar size={20} className="text-primary" />
                             <h3>مصروفات دورية (فواتير)</h3>
                         </div>
@@ -432,7 +432,7 @@ const Finance = () => {
                 </div>
 
                 {/* Transactions Table Tooltip or Stats */}
-                <div className="card" style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #36a2eb 100%)', color: 'white' }}>
+                <div className="card tips-card">
                     <div style={{ padding: '20px' }}>
                         <h4 style={{ opacity: 0.9, marginBottom: '8px' }}>نصيحة مالية</h4>
                         <p style={{ fontSize: '14px', lineHeight: '1.6' }}>
@@ -480,7 +480,7 @@ const Finance = () => {
                 </div>
 
                 {showFilters && (
-                    <div className="filter-bar glass" style={{ marginBottom: '24px', padding: '20px', borderRadius: '14px', display: 'flex', gap: '32px', flexWrap: 'wrap', animation: 'slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+                    <div className="filter-bar glass dashboard-fade-in finance-filters">
                         <div className="filter-item">
                             <label className="filter-label">نوع العملية</label>
                             <div className="segmented-control">
@@ -657,7 +657,7 @@ const Finance = () => {
             {/* Account Statement Modal */}
             {showStatementModal && selectedAccountForStatement && (
                 <div className="modal-overlay">
-                    <div className="modal glass" style={{ maxWidth: '800px', width: '90%' }}>
+                    <div className="modal glass statement-modal">
                         <div className="modal-header-tools">
                             <h3>كشف حساب: {selectedAccountForStatement.name}</h3>
                             <div className="account-total-badge">

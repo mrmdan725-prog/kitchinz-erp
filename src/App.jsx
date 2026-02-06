@@ -62,12 +62,12 @@ const NavItem = ({ to, icon: Icon, label, isCollapsed }) => {
   );
 };
 
-const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
+const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const { logout, currentUser } = useApp();
   const perms = currentUser?.permissions || {};
 
   return (
-    <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+    <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''} ${isMobileMenuOpen ? 'mobile-active' : ''}`}>
       <div className="sidebar-header" onClick={() => setIsCollapsed(!isCollapsed)} style={{ cursor: 'pointer' }}>
         <Logo />
       </div>
@@ -93,6 +93,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
 const AppContent = () => {
   const { currentUser, customers, contracts, invoices, logout, isCloudLoading } = useApp();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [globalSearch, setGlobalSearch] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -142,6 +143,7 @@ const AppContent = () => {
   useEffect(() => {
     setGlobalSearch('');
     setIsUserMenuOpen(false);
+    setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
   if (isCloudLoading) {
@@ -186,11 +188,20 @@ const AppContent = () => {
   };
 
   return (
-    <div className="app-container" dir="rtl">
-      <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+    <div className={`app-container ${isMobileMenuOpen ? 'mobile-menu-active' : ''}`} dir="rtl">
+      <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} />
+
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && <div className="mobile-overlay" onClick={() => setIsMobileMenuOpen(false)}></div>}
+
       <main className="content">
-        <header className="main-header" style={{ display: 'flex', alignItems: 'center', height: '80px', padding: '0 32px', gap: '20px' }}>
-          <img src={logoImg} alt="KITCHINZ" style={{ height: '50px', width: 'auto', filter: 'url(#perfect-transparent)' }} />
+        <header className="main-header">
+          <div className="header-left">
+            <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(true)}>
+              <div className="hamburger"></div>
+            </button>
+            <img src={logoImg} alt="KITCHINZ" className="header-logo" />
+          </div>
 
           <div className="intelligence-hub">
             <div className="search-box-wrapper" style={{ position: 'relative', minWidth: '400px' }}>
