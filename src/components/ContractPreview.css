@@ -562,6 +562,7 @@
         width: calc(100% - 30mm) !important;
         page-break-inside: avoid !important;
         background: white !important;
+        z-index: 1000 !important;
     }
 
     /* Extra insurance: Push from top if pricing area is small */
