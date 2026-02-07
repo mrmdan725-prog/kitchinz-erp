@@ -73,14 +73,18 @@
 }
 
 .contract-content-body {
-    flex: 1;
+    flex: 1 1 auto;
     width: 100%;
+}
+
+.content-spacer {
+    flex: 1 1 auto;
 }
 
 .signatures-wrapper {
     width: 100%;
     margin-top: auto;
-    /* Fallback grounding */
+    flex-shrink: 0;
     position: relative;
 }
 
@@ -520,8 +524,10 @@
         padding: 5mm 15mm 10mm 15mm !important;
         display: flex !important;
         flex-direction: column !important;
+        justify-content: space-between !important;
         min-height: 297mm !important;
-        /* Force content to fill at least one sheet */
+        height: 297mm !important;
+        /* Force exact A4 height */
         width: 100% !important;
         box-sizing: border-box !important;
         overflow: visible !important;
@@ -529,8 +535,13 @@
     }
 
     .contract-content-body {
-        flex: 1 !important;
+        flex: 0 1 auto !important;
         width: 100% !important;
+    }
+
+    .content-spacer {
+        flex: 1 1 auto !important;
+        min-height: 50mm !important;
     }
 
     .contract-header-section,
@@ -558,15 +569,14 @@
     }
 
     .signatures-wrapper {
-        position: absolute !important;
-        bottom: 5mm !important;
-        left: 15mm !important;
-        right: 15mm !important;
-        width: calc(100% - 30mm) !important;
+        flex-shrink: 0 !important;
+        width: 100% !important;
         page-break-inside: avoid !important;
         padding-top: 10px !important;
+        padding-bottom: 5mm !important;
         display: block !important;
-        margin-top: 0 !important;
+        margin-top: auto !important;
+        position: relative !important;
     }
 
     /* Extra insurance: Push from top if pricing area is small */
@@ -577,8 +587,7 @@
 
     .footer-pricing-area {
         page-break-inside: avoid !important;
-        margin-bottom: 120px !important;
-        /* Reserve space for signatures */
+        margin-bottom: 0 !important;
     }
 
     .table-wrapper-with-label,
