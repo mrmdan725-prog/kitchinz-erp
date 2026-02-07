@@ -70,11 +70,19 @@
         display: flex !important;
         visibility: visible !important;
         opacity: 1 !important;
-        left: 0 !important;
+        left: 5mm !important;
         top: 0 !important;
         position: absolute !important;
-        width: 15mm !important;
-        height: 100mm !important;
+        width: 60px !important;
+        height: 70mm !important;
+    }
+
+    .contract-watermark {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: rgba(70, 174, 76, 0.05) !important;
+        /* Slightly darker for print visibility */
     }
 }
 
@@ -543,17 +551,18 @@
 
     .contract-sidebar {
         display: flex !important;
-        width: 15mm !important;
-        height: 100mm !important;
+        width: 60px !important;
+        height: 70mm !important;
         position: absolute !important;
-        left: 0 !important;
+        left: 5mm !important;
         top: 0 !important;
     }
 
     .contract-main-content {
         flex: 1 !important;
-        padding: 4mm 12mm 4mm 12mm !important;
-        display: block !important;
+        padding: 0 15mm 30px 15mm !important;
+        display: flex !important;
+        flex-direction: column !important;
         width: 100% !important;
         box-sizing: border-box !important;
         overflow: visible !important;
@@ -566,16 +575,16 @@
 
     .contract-header-section,
     .specs-title {
-        padding-left: 20mm !important;
-        margin-bottom: 3mm !important;
-        font-size: 14px !important;
+        padding-left: 70px !important;
+        margin-bottom: 8px !important;
+        font-size: 18px !important;
     }
 
     /* Professional, readable font sizes */
     .header-info-lines,
     .intro-row {
-        font-size: 13px !important;
-        line-height: 1.6 !important;
+        font-size: 14px !important;
+        line-height: 1.8 !important;
     }
 
     .contract-table,
@@ -584,19 +593,20 @@
     .contract-table th,
     .payment-table td,
     .payment-table th {
-        font-size: 12px !important;
-        line-height: 1.5 !important;
-        padding: 4px 6px !important;
+        font-size: 14px !important;
+        line-height: 1.6 !important;
+        padding: 6px 8px !important;
     }
 
     .table-wrapper-with-label {
-        margin-bottom: 3mm !important;
+        margin-bottom: 12px !important;
     }
 
     .title-green-box {
-        font-size: 20px !important;
-        padding: 4px 20px !important;
-        margin-bottom: 4mm !important;
+        font-size: 38px !important;
+        padding: 0 60px 5px 60px !important;
+        margin-bottom: 15px !important;
+        height: 60px !important;
     }
 
     .terms-page-content {
