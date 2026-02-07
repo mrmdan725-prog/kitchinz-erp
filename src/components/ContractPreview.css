@@ -81,6 +81,7 @@
     width: 100%;
     margin-top: auto;
     /* Fallback grounding */
+    position: relative;
 }
 
 .contract-header-section,
@@ -523,6 +524,7 @@
         width: 100% !important;
         box-sizing: border-box !important;
         overflow: visible !important;
+        position: relative !important;
     }
 
     .contract-content-body {
@@ -555,19 +557,37 @@
     }
 
     .signatures-wrapper {
-        margin-top: auto !important;
-        width: 100% !important;
+        position: absolute !important;
+        bottom: 10mm !important;
+        left: 15mm !important;
+        right: 15mm !important;
+        width: calc(100% - 30mm) !important;
         page-break-inside: avoid !important;
         padding-top: 20px !important;
         display: block !important;
+        margin-top: 0 !important;
     }
 
     /* Extra insurance: Push from top if pricing area is small */
     .pricing-and-payment-wrapper {
         flex-shrink: 0 !important;
+        page-break-inside: avoid !important;
     }
 
     .footer-pricing-area {
+        page-break-inside: avoid !important;
+        margin-bottom: 150px !important;
+        /* Reserve space for signatures */
+    }
+
+    .table-wrapper-with-label,
+    .contract-table,
+    .payment-table {
+        page-break-inside: avoid !important;
+    }
+
+    .grand-total-section,
+    .payment-tab-header {
         page-break-inside: avoid !important;
     }
 
