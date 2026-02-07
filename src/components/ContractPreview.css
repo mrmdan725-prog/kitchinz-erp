@@ -463,7 +463,7 @@
 
     /* CRITICAL: Force white backgrounds everywhere to override dark mode */
     /* EXCEPTION: Don't force white on elements that HAVE specific brand colors */
-    *:not(.table-side-label):not(.side-label-text):not(.title-green-box):not(.contract-sidebar):not(.sidebar-branding-img):not(.contract-watermark),
+    *:not(.table-side-label):not(.side-label-text):not(.title-green-box):not(.contract-sidebar):not(.sidebar-branding-img):not(.contract-watermark):not(.total-amount-tag):not(.payment-tab-header),
     *::before,
     *::after,
     html,
@@ -481,7 +481,9 @@
     }
 
     /* Restore specific brand colors after the global override */
-    .table-side-label {
+    .table-side-label,
+    .total-amount-tag,
+    .payment-tab-header {
         background: var(--light-green) !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -649,8 +651,9 @@
     .signatures-wrapper {
         width: 100% !important;
         page-break-inside: avoid !important;
-        margin-top: 20px !important;
-        padding-bottom: 5mm !important;
+        margin-top: auto !important;
+        /* GROUND SIGNATURES AT BOTTOM */
+        padding-bottom: 10mm !important;
     }
 
     /* Extra insurance: Push from top if pricing area is small */
