@@ -614,8 +614,8 @@
 
     .contract-content-body {
         width: 100% !important;
-        padding-bottom: 40mm !important;
-        /* SHIELD FROM ABSOLUTE SIGNATURES */
+        flex: 1 !important;
+        /* ALLOW THIS TO PUSH SIGNATURES DOWN */
     }
 
     .contract-header-section,
@@ -673,14 +673,14 @@
     }
 
     .signatures-wrapper {
-        position: absolute !important;
-        bottom: 12mm !important;
-        /* Slightly more gap from edge */
-        right: 15mm !important;
-        left: 15mm !important;
-        width: auto !important;
+        position: relative !important;
+        width: 100% !important;
+        margin-top: auto !important;
+        /* GROUND SIGNATURES AT BOTTOM VIA FLEX */
+        padding-bottom: 10mm !important;
         page-break-inside: avoid !important;
-        z-index: 100 !important;
+        break-inside: avoid !important;
+        z-index: 1 !important;
     }
 
     /* Extra insurance: Push from top if pricing area is small */
