@@ -477,9 +477,17 @@
     .payment-tab-header,
     .total-row-highlight td,
     .terms-header-text,
-    .canva-sig-box {
+    .canva-sig-box,
+    .side-label-text {
         background-color: var(--light-green) !important;
         background: var(--light-green) !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .side-label-text {
+        background-color: transparent !important;
+        background: transparent !important;
     }
 
     .canva-sig-box {
@@ -491,6 +499,8 @@
     .contract-sidebar {
         background: transparent !important;
         background-color: transparent !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
 
     .side-label-text {
@@ -572,12 +582,20 @@
     }
 
     .contract-sidebar {
-        display: flex !important;
+        display: block !important;
         width: 60px !important;
         height: 70mm !important;
         position: absolute !important;
         left: 5mm !important;
         top: 0 !important;
+        z-index: 50 !important;
+    }
+
+    .sidebar-branding-img {
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+        object-fit: contain !important;
     }
 
     .contract-main-content {
@@ -656,12 +674,13 @@
 
     .signatures-wrapper {
         position: absolute !important;
-        bottom: 10mm !important;
+        bottom: 12mm !important;
+        /* Slightly more gap from edge */
         right: 15mm !important;
         left: 15mm !important;
         width: auto !important;
         page-break-inside: avoid !important;
-        z-index: 20 !important;
+        z-index: 100 !important;
     }
 
     /* Extra insurance: Push from top if pricing area is small */
