@@ -545,7 +545,7 @@
 
     .contract-main-content {
         flex: 1 !important;
-        padding: 5mm 15mm 5mm 15mm !important;
+        padding: 3mm 10mm 3mm 10mm !important;
         display: block !important;
         width: 100% !important;
         box-sizing: border-box !important;
@@ -559,8 +559,28 @@
 
     .contract-header-section,
     .specs-title {
-        padding-left: 70px !important;
-        /* Avoid sidebar at top */
+        padding-left: 10px !important;
+        margin-bottom: 2mm !important;
+        font-size: 11px !important;
+    }
+
+    /* Reduce all text sizes */
+    .header-info-lines,
+    .intro-row,
+    .contract-table,
+    .payment-table {
+        font-size: 10px !important;
+        line-height: 1.3 !important;
+    }
+
+    .table-wrapper-with-label {
+        margin-bottom: 2mm !important;
+    }
+
+    .title-green-box {
+        font-size: 18px !important;
+        padding: 3px 20px !important;
+        margin-bottom: 3mm !important;
     }
 
     .terms-page-content {
