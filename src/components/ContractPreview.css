@@ -73,19 +73,14 @@
 }
 
 .contract-content-body {
-    flex: 1 1 auto;
+    flex: 1;
     width: 100%;
-}
-
-.content-spacer {
-    flex: 1 1 auto;
 }
 
 .signatures-wrapper {
     width: 100%;
-    margin-top: auto;
-    flex-shrink: 0;
-    position: relative;
+    margin-top: 30mm;
+    page-break-inside: avoid;
 }
 
 .contract-header-section,
@@ -522,12 +517,8 @@
     .contract-main-content {
         flex: 1 !important;
         padding: 5mm 15mm 10mm 15mm !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: space-between !important;
-        min-height: 297mm !important;
-        height: 297mm !important;
-        /* Force exact A4 height */
+        display: block !important;
+        min-height: calc(297mm - 10mm) !important;
         width: 100% !important;
         box-sizing: border-box !important;
         overflow: visible !important;
@@ -535,13 +526,8 @@
     }
 
     .contract-content-body {
-        flex: 0 1 auto !important;
         width: 100% !important;
-    }
-
-    .content-spacer {
-        flex: 1 1 auto !important;
-        min-height: 50mm !important;
+        padding-bottom: 100mm !important;
     }
 
     .contract-header-section,
@@ -569,14 +555,13 @@
     }
 
     .signatures-wrapper {
-        flex-shrink: 0 !important;
-        width: 100% !important;
+        position: fixed !important;
+        bottom: 10mm !important;
+        left: 15mm !important;
+        right: 15mm !important;
+        width: calc(100% - 30mm) !important;
         page-break-inside: avoid !important;
-        padding-top: 10px !important;
-        padding-bottom: 5mm !important;
-        display: block !important;
-        margin-top: auto !important;
-        position: relative !important;
+        background: white !important;
     }
 
     /* Extra insurance: Push from top if pricing area is small */
