@@ -462,7 +462,8 @@
     }
 
     /* CRITICAL: Force white backgrounds everywhere to override dark mode */
-    *,
+    /* EXCEPTION: Don't force white on elements that HAVE specific brand colors */
+    *:not(.table-side-label):not(.side-label-text):not(.title-green-box):not(.contract-sidebar):not(.sidebar-branding-img):not(.contract-watermark),
     *::before,
     *::after,
     html,
@@ -477,6 +478,24 @@
         background: white !important;
         background-color: white !important;
         color-scheme: light !important;
+    }
+
+    /* Restore specific brand colors after the global override */
+    .table-side-label {
+        background: var(--light-green) !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .side-label-text {
+        background: transparent !important;
+        color: #000 !important;
+    }
+
+    .title-green-box {
+        background: var(--light-green) !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
     /* Hide EVERYTHING except the contract container */
