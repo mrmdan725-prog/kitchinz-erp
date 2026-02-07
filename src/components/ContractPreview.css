@@ -528,6 +528,7 @@
     .contract-content-body {
         width: 100% !important;
         padding-bottom: 0 !important;
+        /* Updated: 2026-02-07 15:58 - NO WHITE SPACE */
     }
 
     .contract-header-section,
