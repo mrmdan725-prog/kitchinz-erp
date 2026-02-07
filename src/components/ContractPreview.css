@@ -59,6 +59,12 @@
     display: block;
 }
 
+@media print {
+    .sidebar-branding-img {
+        display: none !important;
+    }
+}
+
 /* Main Content Area */
 .contract-main-content {
     flex: 1;
