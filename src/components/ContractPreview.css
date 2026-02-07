@@ -452,6 +452,24 @@
         display: none !important;
     }
 
+    /* CRITICAL: Force white backgrounds everywhere to override dark mode */
+    *,
+    *::before,
+    *::after,
+    html,
+    body,
+    #root,
+    .app-container,
+    .contract-paper-container,
+    .contract-page,
+    .second-page,
+    .loading-body,
+    .loading-body::before {
+        background: white !important;
+        background-color: white !important;
+        color-scheme: light !important;
+    }
+
     /* Hide EVERYTHING except the contract container */
     body>*:not(#root),
     #root>*:not(.app-container),
