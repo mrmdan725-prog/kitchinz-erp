@@ -512,6 +512,7 @@
     .contract-page {
         width: 210mm !important;
         min-height: auto !important;
+        max-height: 297mm !important;
         height: auto !important;
         margin: 0 !important;
         padding: 0 !important;
@@ -522,7 +523,9 @@
         background: #fff !important;
         border: none !important;
         page-break-after: auto !important;
-        overflow: visible !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        overflow: hidden !important;
         position: relative !important;
     }
 
