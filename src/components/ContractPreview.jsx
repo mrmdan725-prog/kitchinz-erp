@@ -321,6 +321,7 @@ const ContractPreview = ({ data = {} }) => {
 
     return (
         <div className="contract-paper-container multidimensional">
+            {/* PAGE 1: Specifications & Components */}
             <div className="contract-page">
                 <ContractSidebar />
                 <div className="contract-main-content">
@@ -330,6 +331,15 @@ const ContractPreview = ({ data = {} }) => {
                         <SpecificationsTable woodSpecs={data.woodSpecs} />
                         <InternalComponentsTable components={data.components} />
                         <AccessoriesTable accessories={data.accessories} />
+                    </div>
+                </div>
+            </div>
+
+            {/* PAGE 2: Pricing, Payments & Signatures */}
+            <div className="contract-page">
+                <ContractSidebar />
+                <div className="contract-main-content">
+                    <div className="contract-content-body">
                         <PricingAndPaymentSection data={data} />
                     </div>
                     <div className="signatures-wrapper">
@@ -338,6 +348,7 @@ const ContractPreview = ({ data = {} }) => {
                 </div>
             </div>
 
+            {/* PAGE 3: Terms & Conditions */}
             <ContractTermsPage data={data} />
         </div>
     );
