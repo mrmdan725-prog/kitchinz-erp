@@ -603,11 +603,32 @@
     .contract-table,
     .payment-table {
         page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
 
     .grand-total-section,
     .payment-tab-header {
         page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* Prevent all major sections from breaking across pages */
+    .header-info-lines,
+    .contract-intro,
+    .specifications-section,
+    .pricing-and-payment-wrapper,
+    .signatures-wrapper {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* Reduce margins to fit more content */
+    .contract-header-section {
+        margin-bottom: 5mm !important;
+    }
+
+    .table-wrapper-with-label {
+        margin-bottom: 3mm !important;
     }
 
     /* Visual Fixes */
