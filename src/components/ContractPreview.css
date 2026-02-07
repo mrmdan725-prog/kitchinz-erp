@@ -492,8 +492,8 @@
     }
 
     .canva-sig-box {
-        background-color: #EBFCF1 !important;
-        background: #EBFCF1 !important;
+        background-color: transparent !important;
+        background: transparent !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
@@ -557,8 +557,12 @@
         flex-direction: row !important;
         position: relative !important;
         overflow: hidden !important;
-        page-break-after: always !important;
-        /* Force split */
+    }
+
+    /* Force Page 2 and Page 3 to start fresh */
+    .contract-page+.contract-page {
+        page-break-before: always !important;
+        break-before: page !important;
     }
 
     .second-page {
@@ -581,6 +585,10 @@
         left: 5mm !important;
         top: 0 !important;
         z-index: 50 !important;
+    }
+
+    .page-2-pricing .contract-sidebar {
+        display: none !important;
     }
 
     .sidebar-branding-img {

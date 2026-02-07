@@ -336,7 +336,7 @@ const ContractPreview = ({ data = {} }) => {
             </div>
 
             {/* PAGE 2: Pricing, Payments & Signatures */}
-            <div className="contract-page">
+            <div className="contract-page page-2-pricing">
                 <ContractSidebar />
                 <div className="contract-main-content">
                     <div className="contract-content-body">
