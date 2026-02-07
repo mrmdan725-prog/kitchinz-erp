@@ -512,20 +512,19 @@
     .contract-page {
         width: 210mm !important;
         min-height: auto !important;
-        max-height: 297mm !important;
+        max-height: 290mm !important;
         height: auto !important;
         margin: 0 !important;
         padding: 0 !important;
         box-shadow: none !important;
         display: flex !important;
         flex-direction: row !important;
-        /* Sidebar R, Content L */
         background: #fff !important;
         border: none !important;
         page-break-after: auto !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
-        overflow: hidden !important;
+        overflow: visible !important;
         position: relative !important;
     }
 
@@ -548,7 +547,7 @@
 
     .contract-main-content {
         flex: 1 !important;
-        padding: 3mm 10mm 3mm 10mm !important;
+        padding: 2mm 8mm 2mm 8mm !important;
         display: block !important;
         width: 100% !important;
         box-sizing: border-box !important;
@@ -562,28 +561,33 @@
 
     .contract-header-section,
     .specs-title {
-        padding-left: 10px !important;
-        margin-bottom: 2mm !important;
-        font-size: 11px !important;
+        padding-left: 8px !important;
+        margin-bottom: 1mm !important;
+        font-size: 9px !important;
     }
 
-    /* Reduce all text sizes */
+    /* Extreme text size reduction */
     .header-info-lines,
     .intro-row,
     .contract-table,
-    .payment-table {
-        font-size: 10px !important;
-        line-height: 1.3 !important;
+    .payment-table,
+    .contract-table td,
+    .contract-table th,
+    .payment-table td,
+    .payment-table th {
+        font-size: 8px !important;
+        line-height: 1.2 !important;
+        padding: 1px 2px !important;
     }
 
     .table-wrapper-with-label {
-        margin-bottom: 2mm !important;
+        margin-bottom: 1mm !important;
     }
 
     .title-green-box {
-        font-size: 18px !important;
-        padding: 3px 20px !important;
-        margin-bottom: 3mm !important;
+        font-size: 16px !important;
+        padding: 2px 15px !important;
+        margin-bottom: 2mm !important;
     }
 
     .terms-page-content {
