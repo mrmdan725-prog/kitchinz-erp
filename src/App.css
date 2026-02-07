@@ -1246,6 +1246,10 @@ p.text-secondary {
     transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 100;
     width: 280px;
+    overflow-y: auto;
+    /* Enable scrolling on mobile */
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling on iOS */
   }
 
   .sidebar.mobile-active {
@@ -1362,6 +1366,42 @@ p.text-secondary {
   .quick-action-btn.github-style {
     min-width: unset;
     padding: 16px;
+  }
+
+  /* Settings Page Mobile */
+  .settings-container {
+    grid-template-columns: 1fr !important;
+    /* Single column on mobile */
+  }
+
+  .settings-sidebar {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+    padding: 12px !important;
+    border-left: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .settings-nav-item {
+    white-space: nowrap;
+    min-width: fit-content;
+  }
+
+  .settings-content {
+    padding: 20px !important;
+  }
+
+  .user-card {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 12px;
+  }
+
+  .user-info {
+    width: 100%;
   }
 }
 
