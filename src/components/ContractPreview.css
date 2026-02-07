@@ -504,14 +504,7 @@
     }
 
     .contract-sidebar {
-        width: 60px !important;
-        height: 70mm !important;
-        background-color: var(--sidebar-black) !important;
-        position: absolute !important;
-        left: 5mm !important;
-        top: 0 !important;
-        z-index: 2 !important;
-        margin: 0 !important;
+        display: none !important;
     }
 
     .contract-main-content {
