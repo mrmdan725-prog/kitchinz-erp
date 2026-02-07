@@ -62,6 +62,18 @@
 @media print {
     .sidebar-branding-img {
         display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+
+    .contract-sidebar,
+    .contract-page .contract-sidebar,
+    .second-page .contract-sidebar {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        opacity: 0 !important;
     }
 }
 
