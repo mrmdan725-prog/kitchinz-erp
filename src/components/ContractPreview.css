@@ -493,7 +493,8 @@
 
     .contract-page {
         width: 210mm !important;
-        min-height: 297mm !important;
+        min-height: auto !important;
+        height: auto !important;
         margin: 0 !important;
         padding: 0 !important;
         box-shadow: none !important;
@@ -516,8 +517,7 @@
         padding: 10mm 4mm !important;
         /* Reduced horizontal margins for print only */
         height: auto !important;
-        min-height: 297mm !important;
-        /* ENFORCE A4 HEIGHT FOR SIGNATURE GROUNDING */
+        min-height: auto !important;
         display: flex !important;
     }
 
