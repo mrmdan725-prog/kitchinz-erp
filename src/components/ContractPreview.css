@@ -462,31 +462,35 @@
     }
 
     /* CRITICAL: Force white backgrounds everywhere to override dark mode */
-    /* EXCEPTION: Don't force white on elements that HAVE specific brand colors */
-    *:not(.table-side-label):not(.side-label-text):not(.title-green-box):not(.contract-sidebar):not(.sidebar-branding-img):not(.contract-watermark):not(.total-amount-tag):not(.payment-tab-header),
+    *,
     *::before,
-    *::after,
-    html,
-    body,
-    #root,
-    .app-container,
-    .contract-paper-container,
-    .contract-page,
-    .second-page,
-    .loading-body,
-    .loading-body::before {
-        background: white !important;
+    *::after {
         background-color: white !important;
-        color-scheme: light !important;
-    }
-
-    /* Restore specific brand colors after the global override */
-    .table-side-label,
-    .total-amount-tag,
-    .payment-tab-header {
-        background: var(--light-green) !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
+    }
+
+    /* SPECIFIC BRAND EXCEPTIONS: These MUST keep their colors */
+    .title-green-box,
+    .table-side-label,
+    .total-amount-tag,
+    .payment-tab-header,
+    .total-row-highlight td,
+    .terms-header-text,
+    .canva-sig-box {
+        background-color: var(--light-green) !important;
+        background: var(--light-green) !important;
+    }
+
+    .canva-sig-box {
+        background-color: #EBFCF1 !important;
+        background: #EBFCF1 !important;
+    }
+
+    .sidebar-branding-img,
+    .contract-sidebar {
+        background: transparent !important;
+        background-color: transparent !important;
     }
 
     .side-label-text {
@@ -541,20 +545,17 @@
 
     .contract-page {
         width: 210mm !important;
+        height: 297mm !important;
+        /* EXACT A4 */
         min-height: 297mm !important;
-        height: auto !important;
         margin: 0 !important;
         padding: 0 !important;
-        box-shadow: none !important;
+        background: white !important;
         display: flex !important;
         flex-direction: row !important;
-        background: #fff !important;
-        border: none !important;
-        page-break-after: auto !important;
-        page-break-inside: auto !important;
-        break-inside: auto !important;
-        overflow: visible !important;
         position: relative !important;
+        overflow: hidden !important;
+        /* Prevent bleed */
     }
 
     .second-page {
@@ -581,7 +582,10 @@
 
     .contract-main-content {
         flex: 1 !important;
-        padding: 0 15mm 30px 15mm !important;
+        height: 100% !important;
+        /* FILL THE PAGE */
+        padding: 0 15mm 10mm 15mm !important;
+        /* Reduced bottom padding */
         display: flex !important;
         flex-direction: column !important;
         width: 100% !important;
@@ -592,6 +596,8 @@
 
     .contract-content-body {
         width: 100% !important;
+        padding-bottom: 40mm !important;
+        /* SHIELD FROM ABSOLUTE SIGNATURES */
     }
 
     .contract-header-section,
@@ -649,11 +655,13 @@
     }
 
     .signatures-wrapper {
-        width: 100% !important;
+        position: absolute !important;
+        bottom: 10mm !important;
+        right: 15mm !important;
+        left: 15mm !important;
+        width: auto !important;
         page-break-inside: avoid !important;
-        margin-top: auto !important;
-        /* GROUND SIGNATURES AT BOTTOM */
-        padding-bottom: 10mm !important;
+        z-index: 20 !important;
     }
 
     /* Extra insurance: Push from top if pricing area is small */
