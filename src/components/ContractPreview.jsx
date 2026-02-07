@@ -289,13 +289,11 @@ const SignaturesSection = ({ showTerms = true }) => (
         <div className="signatures-area">
             <div className="sig-box-wrapper">
                 <div className="canva-sig-box">
-                    <div style={{ flex: 1 }}></div> {/* SPACER TO PUSH TITLE DOWN */}
                     <div className="sig-title">توقيع الطرف الاول ( الشركة )</div>
                 </div>
             </div>
             <div className="sig-box-wrapper">
                 <div className="canva-sig-box">
-                    <div style={{ flex: 1 }}></div> {/* SPACER TO PUSH TITLE DOWN */}
                     <div className="sig-title">توقيع الطرف الثاني ( العميل )</div>
                 </div>
             </div>
