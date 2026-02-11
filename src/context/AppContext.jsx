@@ -1,18 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { db } from '../firebase';
-import {
-    collection,
-    onSnapshot,
-    addDoc,
-    updateDoc,
-    deleteDoc,
-    doc,
-    setDoc,
-    getDocs,
-    writeBatch,
-    query,
-    where
-} from 'firebase/firestore';
+import { supabase } from '../supabase';
 
 const AppContext = createContext();
 
@@ -129,10 +116,18 @@ export const AppProvider = ({ children }) => {
 
     const [isCloudLoading, setIsCloudLoading] = useState(true);
 
-    // Migration & Real-time Sync Logic
+    // Migration & Real-time Sync Logic (Supabase)
     useEffect(() => {
-        const syncCollections = async () => {
-            const collectionsToSync = [
+        let activeChannels = [];
+
+        const startSync = async () => {
+            if (!supabase) {
+                console.warn("Supabase client not initialized. Real-time sync disabled.");
+                setIsCloudLoading(false);
+                return;
+            }
+
+            const tablesToSync = [
                 { name: 'customers', state: customers, setter: setCustomers },
                 { name: 'purchases', state: purchases, setter: setPurchases },
                 { name: 'inventory', state: inventory, setter: setInventory },
@@ -147,52 +142,52 @@ export const AppProvider = ({ children }) => {
                 { name: 'recurring', state: recurringExpenses, setter: setRecurringExpenses }
             ];
 
-            const unsubs = collectionsToSync.map(collSpec => {
-                const collRef = collection(db, collSpec.name);
-
-                return onSnapshot(collRef, (snapshot) => {
-                    const cloudData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-
-                    if (collSpec.isSingle) {
-                        if (cloudData.length > 0) collSpec.setter(cloudData[0]);
-                    } else if (cloudData.length > 0) {
-                        collSpec.setter(cloudData);
-                    }
-                }, (error) => {
-                    console.error(`Error syncing ${collSpec.name}:`, error);
-                });
-            });
-
-            // Initial Migration Check
+            // 1. Initial Migration Check (LocalStorage to Supabase)
             try {
-                const batch = writeBatch(db);
-                let migrationNeeded = false;
+                for (const tableSpec of tablesToSync) {
+                    const { data: existingData, error } = await supabase.from(tableSpec.name).select('*');
 
-                for (const collSpec of collectionsToSync) {
-                    const snap = await getDocs(collection(db, collSpec.name));
-                    if (snap.empty && collSpec.state.length > 0) {
-                        migrationNeeded = true;
-                        collSpec.state.forEach(item => {
-                            const docRef = doc(collection(db, collSpec.name), item.id || Date.now().toString() + Math.random().toString());
-                            batch.set(docRef, item);
-                        });
+                    if (error) throw error;
+
+                    if ((!existingData || existingData.length === 0) && tableSpec.state.length > 0) {
+                        console.log(`Migrating ${tableSpec.name} to Supabase...`);
+                        const dataToInsert = tableSpec.isSingle ? [tableSpec.state] : tableSpec.state;
+                        // Supabase doesn't like duplicate IDs if they already exist, but we checked empty
+                        await supabase.from(tableSpec.name).insert(dataToInsert);
+                    } else if (existingData && existingData.length > 0) {
+                        if (tableSpec.isSingle) tableSpec.setter(existingData[0]);
+                        else tableSpec.setter(existingData);
                     }
-                }
-
-                if (migrationNeeded) {
-                    console.log("Migrating local storage to cloud...");
-                    await batch.commit();
                 }
             } catch (err) {
-                console.warn("Cloud connection not active. Using local storage Fallback.", err);
+                console.warn("Supabase connection issues or migration failed. Using local storage Fallback.", err);
             } finally {
                 setIsCloudLoading(false);
             }
 
-            return () => unsubs.forEach(unsub => unsub());
+            // 2. Set up real-time sync via Supabase Channels
+            activeChannels = tablesToSync.map(tableSpec => {
+                return supabase.channel(`public:${tableSpec.name}`)
+                    .on('postgres_changes', { event: '*', schema: 'public', table: tableSpec.name }, (payload) => {
+                        console.log(`Change received for ${tableSpec.name}:`, payload);
+
+                        // Refetch all for simplicity or handle individual events
+                        supabase.from(tableSpec.name).select('*').then(({ data }) => {
+                            if (data) {
+                                if (tableSpec.isSingle) tableSpec.setter(data[0]);
+                                else tableSpec.setter(data);
+                            }
+                        });
+                    })
+                    .subscribe();
+            });
         };
 
-        syncCollections();
+        startSync();
+
+        return () => {
+            activeChannels.forEach(channel => channel.unsubscribe());
+        };
     }, []);
 
     useEffect(() => {
@@ -274,7 +269,7 @@ export const AppProvider = ({ children }) => {
         };
         setTransactions([newTransaction, ...transactions]);
         try {
-            await setDoc(doc(db, 'transactions', id), newTransaction);
+            if (supabase) await supabase.from('transactions').insert(newTransaction);
         } catch (e) { console.error(e); }
 
         // Update Physical Account Balance
@@ -326,7 +321,7 @@ export const AppProvider = ({ children }) => {
             }));
 
             try {
-                await deleteDoc(doc(db, 'transactions', id));
+                if (supabase) await supabase.from('transactions').delete().eq('id', id);
             } catch (e) { console.error(e); }
         }
         setTransactions(transactions.filter(t => t.id !== id));
@@ -382,7 +377,7 @@ export const AppProvider = ({ children }) => {
 
         setTransactions(transactions.map(t => t.id === updatedTransaction.id ? updatedTransaction : t));
         try {
-            await setDoc(doc(db, 'transactions', updatedTransaction.id), updatedTransaction);
+            if (supabase) await supabase.from('transactions').update(updatedTransaction).eq('id', updatedTransaction.id);
         } catch (e) { console.error(e); }
     };
 
@@ -391,21 +386,21 @@ export const AppProvider = ({ children }) => {
         const newAcc = { ...account, id, balance: Number(account.balance) || 0 };
         setAccounts([...accounts, newAcc]);
         try {
-            await setDoc(doc(db, 'accounts', id), newAcc);
+            if (supabase) await supabase.from('accounts').insert(newAcc);
         } catch (e) { console.error(e); }
     };
 
     const updateAccount = async (updatedAccount) => {
         setAccounts(accounts.map(acc => acc.id === updatedAccount.id ? updatedAccount : acc));
         try {
-            await setDoc(doc(db, 'accounts', updatedAccount.id), updatedAccount);
+            if (supabase) await supabase.from('accounts').update(updatedAccount).eq('id', updatedAccount.id);
         } catch (e) { console.error(e); }
     };
 
     const deleteAccount = async (id) => {
         setAccounts(accounts.filter(acc => acc.id !== id));
         try {
-            await deleteDoc(doc(db, 'accounts', id));
+            if (supabase) await supabase.from('accounts').delete().eq('id', id);
         } catch (e) { console.error(e); }
     };
 
@@ -461,21 +456,21 @@ export const AppProvider = ({ children }) => {
         const newEmp = { ...employee, id };
         setEmployees([...employees, newEmp]);
         try {
-            await setDoc(doc(db, 'employees', id), newEmp);
+            if (supabase) await supabase.from('employees').insert(newEmp);
         } catch (e) { console.error(e); }
     };
 
     const updateEmployee = async (updatedEmployee) => {
         setEmployees(employees.map(e => e.id === updatedEmployee.id ? updatedEmployee : e));
         try {
-            await setDoc(doc(db, 'employees', updatedEmployee.id), updatedEmployee);
+            if (supabase) await supabase.from('employees').update(updatedEmployee).eq('id', updatedEmployee.id);
         } catch (e) { console.error(e); }
     };
 
     const deleteEmployee = async (id) => {
         setEmployees(employees.filter(e => e.id !== id));
         try {
-            await deleteDoc(doc(db, 'employees', id));
+            if (supabase) await supabase.from('employees').delete().eq('id', id);
         } catch (e) { console.error(e); }
     };
 
@@ -510,14 +505,14 @@ export const AppProvider = ({ children }) => {
         const newExc = { ...expense, id };
         setRecurringExpenses([...recurringExpenses, newExc]);
         try {
-            await setDoc(doc(db, 'recurring', id), newExc);
+            if (supabase) await supabase.from('recurring').insert(newExc);
         } catch (e) { console.error(e); }
     };
 
     const deleteRecurring = async (id) => {
         setRecurringExpenses(recurringExpenses.filter(e => e.id !== id));
         try {
-            await deleteDoc(doc(db, 'recurring', id));
+            if (supabase) await supabase.from('recurring').delete().eq('id', id);
         } catch (e) { console.error(e); }
     };
 
@@ -539,21 +534,21 @@ export const AppProvider = ({ children }) => {
         const newCustomer = { ...customer, id, balance: Number(customer.balance) || 0 };
         setCustomers([...customers, newCustomer]);
         try {
-            await setDoc(doc(db, 'customers', id), newCustomer);
+            if (supabase) await supabase.from('customers').insert(newCustomer);
         } catch (e) { console.error(e); }
     };
 
     const updateCustomer = async (updatedCustomer) => {
         setCustomers(prev => prev.map(c => c.id === updatedCustomer.id ? updatedCustomer : c));
         try {
-            await setDoc(doc(db, 'customers', updatedCustomer.id), updatedCustomer);
+            if (supabase) await supabase.from('customers').update(updatedCustomer).eq('id', updatedCustomer.id);
         } catch (e) { console.error(e); }
     };
 
     const deleteCustomer = async (id) => {
         setCustomers(prev => prev.filter(c => c.id !== id));
         try {
-            await deleteDoc(doc(db, 'customers', id));
+            if (supabase) await supabase.from('customers').delete().eq('id', id);
         } catch (e) { console.error(e); }
     };
 
@@ -568,21 +563,21 @@ export const AppProvider = ({ children }) => {
         };
         setInspections([newInsp, ...inspections]);
         try {
-            await setDoc(doc(db, 'inspections', id), newInsp);
+            if (supabase) await supabase.from('inspections').insert(newInsp);
         } catch (e) { console.error(e); }
     };
 
     const updateInspection = async (updated) => {
         setInspections(prev => prev.map(i => i.id === updated.id ? updated : i));
         try {
-            await setDoc(doc(db, 'inspections', updated.id), updated);
+            if (supabase) await supabase.from('inspections').update(updated).eq('id', updated.id);
         } catch (e) { console.error(e); }
     };
 
     const deleteInspection = async (id) => {
         setInspections(prev => prev.filter(i => i.id !== id));
         try {
-            await deleteDoc(doc(db, 'inspections', id));
+            if (supabase) await supabase.from('inspections').delete().eq('id', id);
         } catch (e) { console.error(e); }
     };
 
@@ -610,21 +605,21 @@ export const AppProvider = ({ children }) => {
 
         setInvoices([newInvoice, ...invoices]);
         try {
-            await setDoc(doc(db, 'invoices', id), newInvoice);
+            if (supabase) await supabase.from('invoices').insert(newInvoice);
         } catch (e) { console.error(e); }
     };
 
     const updateInvoice = async (updated) => {
         setInvoices(prev => prev.map(inv => inv.id === updated.id ? updated : inv));
         try {
-            await setDoc(doc(db, 'invoices', updated.id), updated);
+            if (supabase) await supabase.from('invoices').update(updated).eq('id', updated.id);
         } catch (e) { console.error(e); }
     };
 
     const deleteInvoice = async (id) => {
         setInvoices(prev => prev.filter(inv => inv.id !== id));
         try {
-            await deleteDoc(doc(db, 'invoices', id));
+            if (supabase) await supabase.from('invoices').delete().eq('id', id);
         } catch (e) { console.error(e); }
     };
 
@@ -645,7 +640,7 @@ export const AppProvider = ({ children }) => {
         };
         setPurchases([newPurchase, ...purchases]);
         try {
-            await setDoc(doc(db, 'purchases', id), newPurchase);
+            if (supabase) await supabase.from('purchases').insert(newPurchase);
         } catch (e) { console.error(e); }
 
         // Update inventory stock
@@ -708,7 +703,7 @@ export const AppProvider = ({ children }) => {
 
         setPurchases(purchases.map(p => p.id === updatedPurchase.id ? updatedPurchase : p));
         try {
-            await setDoc(doc(db, 'purchases', updatedPurchase.id), updatedPurchase);
+            if (supabase) await supabase.from('purchases').update(updatedPurchase).eq('id', updatedPurchase.id);
         } catch (e) { console.error(e); }
     };
 
@@ -733,7 +728,7 @@ export const AppProvider = ({ children }) => {
             }
 
             try {
-                await deleteDoc(doc(db, 'purchases', id));
+                if (supabase) await supabase.from('purchases').delete().eq('id', id);
             } catch (e) { console.error(e); }
         }
         setPurchases(purchases.filter(p => p.id !== id));
@@ -744,21 +739,21 @@ export const AppProvider = ({ children }) => {
         const newItem = { ...item, id, stock: Number(item.stock) || 0 };
         setInventory([...inventory, newItem]);
         try {
-            await setDoc(doc(db, 'inventory', id), newItem);
+            if (supabase) await supabase.from('inventory').insert(newItem);
         } catch (e) { console.error(e); }
     };
 
     const updateInventoryItem = async (updatedItem) => {
         setInventory(inventory.map(item => item.id === updatedItem.id ? updatedItem : item));
         try {
-            await setDoc(doc(db, 'inventory', updatedItem.id), updatedItem);
+            if (supabase) await supabase.from('inventory').update(updatedItem).eq('id', updatedItem.id);
         } catch (e) { console.error(e); }
     };
 
     const deleteInventoryItem = async (id) => {
         setInventory(inventory.filter(item => item.id !== id));
         try {
-            await deleteDoc(doc(db, 'inventory', id));
+            if (supabase) await supabase.from('inventory').delete().eq('id', id);
         } catch (e) { console.error(e); }
     };
 
@@ -772,7 +767,7 @@ export const AppProvider = ({ children }) => {
         };
         setContracts([newContract, ...contracts]);
         try {
-            await setDoc(doc(db, 'contracts', id), newContract);
+            if (supabase) await supabase.from('contracts').insert(newContract);
         } catch (e) { console.error(e); }
         return newContract;
     };
@@ -780,14 +775,14 @@ export const AppProvider = ({ children }) => {
     const updateContract = async (updatedContract) => {
         setContracts(contracts.map(c => c.id === updatedContract.id ? updatedContract : c));
         try {
-            await setDoc(doc(db, 'contracts', updatedContract.id), updatedContract);
+            if (supabase) await supabase.from('contracts').update(updatedContract).eq('id', updatedContract.id);
         } catch (e) { console.error(e); }
     };
 
     const deleteContract = async (id) => {
         setContracts(contracts.filter(c => c.id !== id));
         try {
-            await deleteDoc(doc(db, 'contracts', id));
+            if (supabase) await supabase.from('contracts').delete().eq('id', id);
         } catch (e) { console.error(e); }
     };
 
@@ -836,7 +831,7 @@ export const AppProvider = ({ children }) => {
 
         setContracts(prev => prev.map(c => c.id === contractId ? updatedContract : c));
         try {
-            await setDoc(doc(db, 'contracts', contractId), updatedContract);
+            if (supabase) await supabase.from('contracts').update(updatedContract).eq('id', contractId);
         } catch (e) { console.error(e); }
     };
 
@@ -868,7 +863,7 @@ export const AppProvider = ({ children }) => {
 
         setContracts(prev => prev.map(c => c.id === contractId ? updatedContract : c));
         try {
-            await setDoc(doc(db, 'contracts', contractId), updatedContract);
+            if (supabase) await supabase.from('contracts').update(updatedContract).eq('id', contractId);
         } catch (e) { console.error(e); }
     };
 
@@ -877,14 +872,14 @@ export const AppProvider = ({ children }) => {
         const newUser = { ...user, id, status: 'active' };
         setUsers([...users, newUser]);
         try {
-            await setDoc(doc(db, 'users', id), newUser);
+            if (supabase) await supabase.from('users').insert(newUser);
         } catch (e) { console.error(e); }
     };
 
     const updateUser = async (updatedUser) => {
         setUsers(users.map(u => u.id === updatedUser.id ? updatedUser : u));
         try {
-            await setDoc(doc(db, 'users', updatedUser.id), updatedUser);
+            if (supabase) await supabase.from('users').update(updatedUser).eq('id', updatedUser.id);
         } catch (e) { console.error(e); }
         // If updating current user, update currentUser state too
         if (currentUser && currentUser.id === updatedUser.id) {
@@ -895,7 +890,7 @@ export const AppProvider = ({ children }) => {
     const deleteUser = async (id) => {
         setUsers(users.filter(u => u.id !== id));
         try {
-            await deleteDoc(doc(db, 'users', id));
+            if (supabase) await supabase.from('users').delete().eq('id', id);
         } catch (e) { console.error(e); }
     };
 
@@ -903,7 +898,7 @@ export const AppProvider = ({ children }) => {
         const updated = { ...systemSettings, ...newSettings };
         setSystemSettings(updated);
         try {
-            await setDoc(doc(db, 'settings', 'global'), updated);
+            if (supabase) await supabase.from('settings').update(updated).eq('id', 'global');
         } catch (e) { console.error(e); }
     };
 

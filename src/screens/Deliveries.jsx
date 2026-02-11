@@ -1,22 +1,31 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Truck, CheckCircle, Clock, Search, MapPin, Phone, FileText } from 'lucide-react';
+import { Truck, CheckCircle, Clock, Search, MapPin, Phone, FileText, FileSpreadsheet } from 'lucide-react';
+import { exportToExcel, formatters } from '../utils/excelExport';
 
 const Deliveries = () => {
     const { contracts, updateContractStatus } = useApp();
     const [searchTerm, setSearchTerm] = useState('');
 
     const deliveringContracts = contracts.filter(c =>
-        c.status === 'delivering' && (
+        (c.status === 'delivering' || c.status === 'delivered') && (
             c.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             c.projectType?.toLowerCase().includes(searchTerm.toLowerCase())
         )
     );
 
     const handleCompleteDelivery = (id) => {
+        const contract = contracts.find(c => c.id === id);
+        if (contract?.status === 'delivered') return;
+
         if (window.confirm('هل تريد وضع علامة "تم التسليم بنجاح" على هذا المشروع؟')) {
             updateContractStatus(id, 'delivered');
         }
+    };
+
+    const handleExport = () => {
+        const dataToExport = deliveringContracts.map(formatters.contract);
+        exportToExcel(dataToExport, 'قائمة_التسليمات', 'التسليمات');
     };
 
     return (
@@ -31,6 +40,10 @@ const Deliveries = () => {
                         <p className="text-secondary">متابعة المشروعات الجاهزة للتسليم للعملاء</p>
                     </div>
                 </div>
+                <button className="btn-export-excel" onClick={handleExport} title="تصدير لإكسل">
+                    <FileSpreadsheet size={18} />
+                    تصدير البيانات
+                </button>
             </div>
 
             <div className="search-bar no-print">
@@ -79,9 +92,9 @@ const Deliveries = () => {
                                     </div>
                                 </div>
                                 <div style={{ textAlign: 'left' }}>
-                                    <div className="status-badge income" style={{ fontSize: '11px', padding: '5px 12px' }}>
-                                        <Clock size={12} style={{ marginLeft: '5px' }} />
-                                        جاهز للتسليم
+                                    <div className={`status-badge ${contract.status === 'delivered' ? 'success' : 'income'}`} style={{ fontSize: '11px', padding: '5px 12px' }}>
+                                        {contract.status === 'delivered' ? <CheckCircle size={12} style={{ marginLeft: '5px' }} /> : <Clock size={12} style={{ marginLeft: '5px' }} />}
+                                        {contract.status === 'delivered' ? 'تم التسليم النهائي' : 'جاهز للتسليم'}
                                     </div>
                                 </div>
                             </div>
@@ -114,12 +127,13 @@ const Deliveries = () => {
 
                             <div style={{ display: 'flex', gap: '10px' }}>
                                 <button
-                                    className="btn-primary"
-                                    style={{ flex: 1, padding: '12px' }}
+                                    className={contract.status === 'delivered' ? 'btn-secondary' : 'btn-primary'}
+                                    style={{ flex: 1, padding: '12px', opacity: contract.status === 'delivered' ? 0.7 : 1, cursor: contract.status === 'delivered' ? 'default' : 'pointer' }}
                                     onClick={() => handleCompleteDelivery(contract.id)}
+                                    disabled={contract.status === 'delivered'}
                                 >
                                     <CheckCircle size={18} />
-                                    إتمام التسليم النهائي
+                                    {contract.status === 'delivered' ? 'تم إتمام التسليم' : 'إتمام التسليم النهائي'}
                                 </button>
                             </div>
                         </div>

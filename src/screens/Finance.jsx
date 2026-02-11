@@ -18,8 +18,10 @@ import {
     Settings as SettingsIcon,
     X,
     Users,
-    ExternalLink
+    ExternalLink,
+    FileSpreadsheet
 } from 'lucide-react';
+import { exportToExcel, formatters } from '../utils/excelExport';
 
 const Finance = () => {
     const {
@@ -235,6 +237,11 @@ const Finance = () => {
         setShowAccountModal(true);
     };
 
+    const handleExport = () => {
+        const dataToExport = filteredTransactions.map(formatters.transaction);
+        exportToExcel(dataToExport, 'العمليات_المالية', 'المعاملات');
+    };
+
     return (
         <div className="page dashboard-fade-in">
             <div className="page-header">
@@ -242,10 +249,16 @@ const Finance = () => {
                     <h2>المالية والمحاسبة</h2>
                     <p className="text-secondary">إدارة الحسابات، التدفقات النقدية والتقارير المالية</p>
                 </div>
-                <button className="btn-primary" onClick={() => setShowAddModal(true)}>
-                    <Plus size={20} />
-                    <span>إضافة عملية مالية</span>
-                </button>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button className="btn-export-excel" onClick={handleExport} title="تصدير لإكسل">
+                        <FileSpreadsheet size={18} />
+                        تصدير البيانات
+                    </button>
+                    <button className="btn-primary" onClick={() => setShowAddModal(true)}>
+                        <Plus size={20} />
+                        <span>إضافة عملية مالية</span>
+                    </button>
+                </div>
             </div>
 
             {/* Financial Stats */}

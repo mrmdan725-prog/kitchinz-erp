@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Package, AlertTriangle, ArrowUpRight, Plus, Edit, Trash2 } from 'lucide-react';
+import { Package, AlertTriangle, ArrowUpRight, Plus, Edit, Trash2, FileSpreadsheet } from 'lucide-react';
+import { exportToExcel, formatters } from '../utils/excelExport';
 
 const Inventory = () => {
     const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem } = useApp();
@@ -53,14 +54,25 @@ const Inventory = () => {
         setFormData({ name: '', unit: 'متر مربع', stock: '' });
     };
 
+    const handleExport = () => {
+        const dataToExport = inventory.map(formatters.inventory);
+        exportToExcel(dataToExport, 'مخزون_المواد', 'المخزن');
+    };
+
     return (
         <div className="page arabic-text">
             <div className="page-header">
                 <h2>مخزون المواد</h2>
-                <button className="btn-primary" onClick={() => setShowModal(true)}>
-                    <Plus size={18} />
-                    إضافة مادة جديدة
-                </button>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button className="btn-export-excel" onClick={handleExport} title="تصدير لإكسل">
+                        <FileSpreadsheet size={18} />
+                        تصدير البيانات
+                    </button>
+                    <button className="btn-primary" onClick={() => setShowModal(true)}>
+                        <Plus size={18} />
+                        إضافة مادة جديدة
+                    </button>
+                </div>
             </div>
 
             <div className="stats-grid">

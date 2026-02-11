@@ -87,9 +87,6 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
             grandTotal: '0',
             amountInWords: '',
 
-            grandTotal: '0',
-            amountInWords: '',
-
             deposit: '0',
             operation: '0',
             delivery: '0'

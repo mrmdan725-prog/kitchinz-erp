@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Plus, ShoppingCart, Calendar, User, Package, Edit, Trash2, Receipt, FileText, Upload, X } from 'lucide-react';
+import { Plus, ShoppingCart, Calendar, User, Package, Edit, Trash2, Receipt, FileText, Upload, X, FileSpreadsheet } from 'lucide-react';
+import { exportToExcel, formatters } from '../utils/excelExport';
 
 const Purchasing = () => {
     const {
@@ -122,14 +123,25 @@ const Purchasing = () => {
         alert('تم إنشاء مسودة الفاتورة بنجاح.');
     };
 
+    const handleExport = () => {
+        const dataToExport = purchases.map(formatters.purchase);
+        exportToExcel(dataToExport, 'مشتريات_المواد', 'المشتريات');
+    };
+
     return (
         <div className="page arabic-text">
             <div className="page-header">
                 <h2>مشتريات المواد</h2>
-                <button className="btn-primary" onClick={() => setShowModal(true)}>
-                    <Plus size={18} />
-                    تسجيل عملية شراء
-                </button>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button className="btn-export-excel" onClick={handleExport} title="تصدير لإكسل">
+                        <FileSpreadsheet size={18} />
+                        تصدير البيانات
+                    </button>
+                    <button className="btn-primary" onClick={() => setShowModal(true)}>
+                        <Plus size={18} />
+                        تسجيل عملية شراء
+                    </button>
+                </div>
             </div>
 
             <div className="stats-grid">

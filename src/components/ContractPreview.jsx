@@ -191,23 +191,30 @@ const AccessoriesTable = ({ accessories = [] }) => {
     );
 };
 
-const PricingAndPaymentSection = ({ data }) => {
-    // Auto-calculate grand total if possible
+const GrandTotalSection = ({ data }) => {
     const woodTotal = (data.woodSpecs || []).reduce((sum, item) => sum + (Number(item.totalPrice) || 0), 0);
     const accTotal = (data.accessories || []).reduce((sum, item) => sum + (Number(item.total) || 0), 0);
     const calculatedGrandTotal = woodTotal + accTotal;
 
-    const splits = data.paymentSplits || { deposit: 60, operation: 30, delivery: 10 };
-
     return (
-        <div className="footer-pricing-area">
+        <div className="footer-pricing-area" style={{ marginTop: '10px' }}>
             <div className="grand-total-section">
                 <span className="total-label-text">التكلفة الاجمالية بعد الاضافات</span>
                 <span className="total-amount-tag" contentEditable={true} suppressContentEditableWarning={true}>{data.grandTotal || calculatedGrandTotal}</span>
                 <span className="total-label-text">فقط لا غير</span>
                 {data.amountInWords && <span className="total-words" contentEditable={true} suppressContentEditableWarning={true}>({data.amountInWords})</span>}
             </div>
+        </div>
+    );
+};
 
+const PaymentSplitsSection = ({ data }) => {
+    const woodTotal = (data.woodSpecs || []).reduce((sum, item) => sum + (Number(item.totalPrice) || 0), 0);
+    const accTotal = (data.accessories || []).reduce((sum, item) => sum + (Number(item.total) || 0), 0);
+    const calculatedGrandTotal = woodTotal + accTotal;
+
+    return (
+        <div className="footer-pricing-area">
             <div className="payment-tab-header">قيمة الدفعات</div>
             <table className="payment-table">
                 <tbody>
@@ -331,16 +338,16 @@ const ContractPreview = ({ data = {} }) => {
                         <SpecificationsTable woodSpecs={data.woodSpecs} />
                         <InternalComponentsTable components={data.components} />
                         <AccessoriesTable accessories={data.accessories} />
+                        <GrandTotalSection data={data} />
                     </div>
                 </div>
             </div>
 
-            {/* PAGE 2: Pricing, Payments & Signatures */}
+            {/* PAGE 2: Payments & Signatures */}
             <div className="contract-page page-2-pricing">
-                {/* No Sidebar on Page 2 as requested */}
                 <div className="contract-main-content">
                     <div className="contract-content-body">
-                        <PricingAndPaymentSection data={data} />
+                        <PaymentSplitsSection data={data} />
                     </div>
                     <div className="signatures-wrapper">
                         <SignaturesSection showTerms={true} />

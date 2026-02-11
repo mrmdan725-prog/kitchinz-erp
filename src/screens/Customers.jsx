@@ -13,8 +13,10 @@ import {
     DollarSign,
     Package,
     Edit2,
-    Trash2
+    Trash2,
+    FileSpreadsheet
 } from 'lucide-react';
+import { exportToExcel, formatters } from '../utils/excelExport';
 
 const Customers = () => {
     const {
@@ -166,14 +168,28 @@ const Customers = () => {
         c.phone.includes(searchTerm)
     );
 
+    const handleExport = () => {
+        const dataToExport = filteredCustomers.map(formatters.customer);
+        exportToExcel(dataToExport, 'قائمة_العملاء', 'العملاء');
+    };
+
     return (
         <div className="page arabic-text">
             <div className="page-header">
-                <h2>إدارة العملاء</h2>
-                <button className="btn-primary" onClick={() => setShowModal(true)}>
-                    <Plus size={18} />
-                    إضافة عميل
-                </button>
+                <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                    <Plus size={24} className="text-primary" />
+                    <h2>إدارة العملاء</h2>
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button className="btn-export-excel" onClick={handleExport} title="تصدير لإكسل">
+                        <FileSpreadsheet size={18} />
+                        تصدير البيانات
+                    </button>
+                    <button className="btn-primary" onClick={() => setShowModal(true)}>
+                        <Plus size={18} />
+                        إضافة عميل
+                    </button>
+                </div>
             </div>
 
             <div className="search-bar glass">

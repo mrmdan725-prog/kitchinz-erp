@@ -610,8 +610,8 @@
         flex: 1 !important;
         height: 100% !important;
         /* FILL THE PAGE */
-        padding: 0 15mm 10mm 15mm !important;
-        /* Reduced bottom padding */
+        padding: 0 15mm 5mm 15mm !important;
+        /* Slightly reduced bottom padding to fit cost */
         display: flex !important;
         flex-direction: column !important;
         width: 100% !important;

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { Plus, Printer, FileText, Search, Edit2, Clock } from 'lucide-react';
+import { Plus, Printer, FileText, Search, Edit2, Clock, X, FileSpreadsheet } from 'lucide-react';
+import { exportToExcel, formatters } from '../utils/excelExport';
 import ContractForm from '../components/ContractForm';
 import ContractPreview from '../components/ContractPreview';
 import ContractDetails from '../components/ContractDetails';
@@ -26,7 +27,8 @@ const Contracts = () => {
     const [selectedContractForDetails, setSelectedContractForDetails] = useState(null);
 
     useEffect(() => {
-        if (location.state?.selectedCustomerName) {
+        // Only trigger if we have a customer name in state AND we aren't already in an active session
+        if (location.state?.selectedCustomerName && !activeContract && !showForm && !isPreviewMode) {
             const customer = customers.find(c => c.name === location.state.selectedCustomerName);
             if (customer) {
                 setActiveContract({ customer });
@@ -34,7 +36,7 @@ const Contracts = () => {
                 setShowForm(true);
             }
         }
-    }, [location.state, customers]);
+    }, [location.state, customers, activeContract, showForm, isPreviewMode]);
 
     const handleContractCreateOrUpdate = (data, shouldSave = false) => {
         if (shouldSave) {
@@ -135,16 +137,27 @@ const Contracts = () => {
         return true;
     });
 
+    const handleExport = () => {
+        const dataToExport = filteredContracts.map(formatters.contract);
+        exportToExcel(dataToExport, 'قائمة_العقود', 'العقود');
+    };
+
     return (
         <div className="page">
             {!isPreviewMode ? (
                 <>
                     <div className="page-header">
                         <h2>إدارة العقود</h2>
-                        <button className="btn-primary" onClick={handleCreateNew}>
-                            <Plus size={18} />
-                            عقد جديد
-                        </button>
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                            <button className="btn-export-excel" onClick={handleExport} title="تصدير لإكسل">
+                                <FileSpreadsheet size={18} />
+                                تصدير البيانات
+                            </button>
+                            <button className="btn-primary" onClick={handleCreateNew}>
+                                <Plus size={18} />
+                                عقد جديد
+                            </button>
+                        </div>
                     </div>
 
                     <div className="search-bar no-print">
@@ -194,9 +207,9 @@ const Contracts = () => {
                                             </div>
                                         </div>
                                         <div className="card-top-actions">
-                                            <button className="btn-icon" onClick={(e) => { e.stopPropagation(); handleViewContract(contract); }} title="عرض"><FileText size={16} /></button>
-                                            <button className="btn-icon" onClick={(e) => { e.stopPropagation(); handleEditContract(contract); }} title="تعديل"><Edit2 size={16} /></button>
-                                            <button className="btn-icon text-danger" onClick={(e) => { e.stopPropagation(); setContractToDelete(contract); }} title="حذف"><Plus size={16} style={{ transform: 'rotate(45deg)' }} /></button>
+                                            <button className="btn-icon-action" onClick={(e) => { e.stopPropagation(); handleViewContract(contract); }} title="عرض"><FileText size={18} /></button>
+                                            <button className="btn-icon-action" onClick={(e) => { e.stopPropagation(); handleEditContract(contract); }} title="تعديل"><Edit2 size={18} /></button>
+                                            <button className="btn-icon-action delete-btn" onClick={(e) => { e.stopPropagation(); setContractToDelete(contract); }} title="حذف"><X size={18} /></button>
                                         </div>
                                     </div>
 
@@ -406,7 +419,30 @@ const Contracts = () => {
                         }
                         .card-top-actions {
                             display: flex;
-                            gap: 5px;
+                            gap: 8px;
+                        }
+                        .btn-icon-action {
+                            width: 38px;
+                            height: 38px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            background: rgba(255, 255, 255, 0.05);
+                            border: 1px solid rgba(255, 255, 255, 0.1);
+                            border-radius: 10px;
+                            color: white;
+                            cursor: pointer;
+                            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                        }
+                        .btn-icon-action:hover {
+                            background: rgba(255, 255, 255, 0.1);
+                            border-color: rgba(255, 255, 255, 0.2);
+                            transform: scale(1.05);
+                        }
+                        .btn-icon-action.delete-btn:hover {
+                            background: rgba(255, 77, 77, 0.15);
+                            border-color: #ff4d4d;
+                            color: #ff4d4d;
                         }
                         .card-middle-status {
                             display: flex;

@@ -9,11 +9,24 @@ import {
     Clock,
     ArrowUpRight,
     Plus,
-    Eye
+    Eye,
+    FileSpreadsheet
 } from 'lucide-react';
+import { exportToExcel, formatters } from '../utils/excelExport';
 
 const Dashboard = () => {
-    const { customers, contracts, purchases, inventory } = useApp();
+    const { customers, contracts, purchases, inventory, transactions } = useApp();
+
+    const handleMasterExport = () => {
+        const masterReport = {
+            'العملاء': customers.map(formatters.customer),
+            'العقود': contracts.map(formatters.contract),
+            'العمليات المالية': transactions.map(formatters.transaction),
+            'المشتريات': purchases.map(formatters.purchase),
+            'المخزن': inventory.map(formatters.inventory)
+        };
+        exportToExcel(masterReport, 'التقرير_الشامل_كيتشينز_ERP');
+    };
 
     // Calculate basic stats
     const totalContractValue = contracts.reduce((acc, c) => acc + (parseFloat(c.accessoriesTotal) || 0), 0);
@@ -47,7 +60,11 @@ const Dashboard = () => {
                         أهلاً بك مجدداً في مركز القيادة الذكي. إليك نظرة شاملة على تطور أعمالك اليوم.
                     </p>
                 </div>
-                <div className="hero-actions">
+                <div className="hero-actions" style={{ display: 'flex', gap: '10px' }}>
+                    <button className="btn-export-excel" onClick={handleMasterExport} title="تصدير التقرير الشامل لإكسل">
+                        <FileSpreadsheet size={18} />
+                        التقرير الشامل (إكسل)
+                    </button>
                     <div className="stat-badge glass">
                         <ArrowUpRight size={18} className="text-primary" />
                         <span className="badge-text">أداء مرتفع (+12.5%)</span>
