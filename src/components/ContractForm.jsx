@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { RotateCcw } from 'lucide-react';
+import { useApp } from '../context/AppContext';
 import './ContractForm.css';
 
 const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
+    const { contractOptions } = useApp();
     const [formData, setFormData] = useState(() => {
         if (initialData) {
             // Migration logic for old data structures
@@ -221,8 +223,7 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
                                         onChange={e => setFormData({ ...formData, projectType: e.target.value })}
                                     >
                                         <option value="">اختر نوع المشروع...</option>
-                                        <option value="مطبخ">مطبخ</option>
-                                        <option value="دريسنج">دريسنج</option>
+                                        {contractOptions.projectTypes?.map(type => <option key={type} value={type}>{type}</option>)}
                                     </select>
                                 </div>
                             </div>
@@ -238,7 +239,7 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
                     </div>
                     <div className="card-body">
                         <div className="premium-form-table-container">
-                            <table className="premium-form-table">
+                            <table className="premium-form-table wood-specs-table">
                                 <thead>
                                     <tr>
                                         <th>الصنف</th>
@@ -252,7 +253,12 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
                                     {formData.woodSpecs.map((wood, idx) => (
                                         <tr key={idx}>
                                             <td className="row-label">{wood.label}</td>
-                                            <td><input className="inner-table-input" type="text" value={wood.type} onChange={e => handleWoodChange(idx, 'type', e.target.value)} /></td>
+                                            <td>
+                                                <select className="inner-table-input" value={wood.type} onChange={e => handleWoodChange(idx, 'type', e.target.value)}>
+                                                    <option value="">اختر...</option>
+                                                    {contractOptions.woodTypes?.map(t => <option key={t} value={t}>{t}</option>)}
+                                                </select>
+                                            </td>
                                             <td><input className="inner-table-input numeric" type="number" value={wood.totalArea} onChange={e => handleWoodChange(idx, 'totalArea', e.target.value)} /></td>
                                             <td><input className="inner-table-input numeric" type="number" value={wood.pricePerMeter} onChange={e => handleWoodChange(idx, 'pricePerMeter', e.target.value)} /></td>
                                             <td><input className="inner-table-input numeric result-field" disabled type="text" value={wood.totalPrice} /></td>
@@ -275,17 +281,51 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
                         <span className="card-title">المكونات الأساسية</span>
                     </div>
                     <div className="card-body">
-                        <div className="form-compact-grid">
-                            <div className="form-field"><label>نوع العلب الداخلية</label><input type="text" value={formData.components.innerShellType} onChange={e => setFormData({ ...formData, components: { ...formData.components, innerShellType: e.target.value } })} /></div>
-                            <div className="form-field"><label>تعليقة</label><input type="text" value={formData.components.hanging} onChange={e => setFormData({ ...formData, components: { ...formData.components, hanging: e.target.value } })} /></div>
-                            <div className="form-field"><label>مفصلات</label><input type="text" value={formData.components.hinges} onChange={e => setFormData({ ...formData, components: { ...formData.components, hinges: e.target.value } })} /></div>
-                            <div className="form-field"><label>قلابات</label><input type="text" value={formData.components.flipUps} onChange={e => setFormData({ ...formData, components: { ...formData.components, flipUps: e.target.value } })} /></div>
-                            <div className="form-field"><label>مجر</label><input type="text" value={formData.components.slides} onChange={e => setFormData({ ...formData, components: { ...formData.components, slides: e.target.value } })} /></div>
-                            <div className="form-field"><label>رجول</label><input type="text" value={formData.components.legs} onChange={e => setFormData({ ...formData, components: { ...formData.components, legs: e.target.value } })} /></div>
-                            <div className="form-field"><label>مقابض العلب العلوية</label><input type="text" value={formData.components.upperHandles} onChange={e => setFormData({ ...formData, components: { ...formData.components, upperHandles: e.target.value } })} /></div>
-                            <div className="form-field"><label>وزر</label><input type="text" value={formData.components.toeKick} onChange={e => setFormData({ ...formData, components: { ...formData.components, toeKick: e.target.value } })} /></div>
-                            <div className="form-field"><label>مقابض العلب السفلية</label><input type="text" value={formData.components.lowerHandles} onChange={e => setFormData({ ...formData, components: { ...formData.components, lowerHandles: e.target.value } })} /></div>
-                            <div className="form-field"><label>مقابض البلاكار</label><input type="text" value={formData.components.closetHandles} onChange={e => setFormData({ ...formData, components: { ...formData.components, closetHandles: e.target.value } })} /></div>
+                        <div className="form-field">
+                            <label>نوع العلب الداخلية</label>
+                            <select className="inner-table-input" value={formData.components.innerShellType} onChange={e => setFormData({ ...formData, components: { ...formData.components, innerShellType: e.target.value } })}>
+                                <option value="">اختر...</option>
+                                {contractOptions.innerShellTypes?.map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
+                        </div>
+                        <div className="form-field"><label>تعليقة</label><input className="inner-table-input" type="text" value={formData.components.hanging} onChange={e => setFormData({ ...formData, components: { ...formData.components, hanging: e.target.value } })} /></div>
+                        <div className="form-field">
+                            <label>مفصلات</label>
+                            <select className="inner-table-input" value={formData.components.hinges} onChange={e => setFormData({ ...formData, components: { ...formData.components, hinges: e.target.value } })}>
+                                <option value="">اختر...</option>
+                                {contractOptions.hingeTypes?.map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
+                        </div>
+                        <div className="form-field"><label>قلابات</label><input className="inner-table-input" type="text" value={formData.components.flipUps} onChange={e => setFormData({ ...formData, components: { ...formData.components, flipUps: e.target.value } })} /></div>
+                        <div className="form-field">
+                            <label>مجر</label>
+                            <select className="inner-table-input" value={formData.components.slides} onChange={e => setFormData({ ...formData, components: { ...formData.components, slides: e.target.value } })}>
+                                <option value="">اختر...</option>
+                                {contractOptions.slideTypes?.map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
+                        </div>
+                        <div className="form-field"><label>رجول</label><input className="inner-table-input" type="text" value={formData.components.legs} onChange={e => setFormData({ ...formData, components: { ...formData.components, legs: e.target.value } })} /></div>
+                        <div className="form-field">
+                            <label>مقابض العلب العلوية</label>
+                            <select className="inner-table-input" value={formData.components.upperHandles} onChange={e => setFormData({ ...formData, components: { ...formData.components, upperHandles: e.target.value } })}>
+                                <option value="">اختر...</option>
+                                {contractOptions.handleTypes?.map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
+                        </div>
+                        <div className="form-field"><label>وزر</label><input className="inner-table-input" type="text" value={formData.components.toeKick} onChange={e => setFormData({ ...formData, components: { ...formData.components, toeKick: e.target.value } })} /></div>
+                        <div className="form-field">
+                            <label>مقابض العلب السفلية</label>
+                            <select className="inner-table-input" value={formData.components.lowerHandles} onChange={e => setFormData({ ...formData, components: { ...formData.components, lowerHandles: e.target.value } })}>
+                                <option value="">اختر...</option>
+                                {contractOptions.handleTypes?.map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
+                        </div>
+                        <div className="form-field">
+                            <label>مقابض البلاكار</label>
+                            <select className="inner-table-input" value={formData.components.closetHandles} onChange={e => setFormData({ ...formData, components: { ...formData.components, closetHandles: e.target.value } })}>
+                                <option value="">اختر...</option>
+                                {contractOptions.handleTypes?.map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -303,7 +343,7 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
                     </div>
                     <div className="card-body">
                         <div className="premium-form-table-container">
-                            <table className="premium-form-table">
+                            <table className="premium-form-table wood-specs-table">
                                 <thead>
                                     <tr>
                                         <th style={{ width: '40px' }}>م</th>
@@ -318,7 +358,12 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
                                     {formData.accessories.map((acc, idx) => (
                                         <tr key={idx}>
                                             <td className="row-number">{idx + 1}</td>
-                                            <td><input className="inner-table-input" type="text" value={acc.name} onChange={e => handleAccChange(idx, 'name', e.target.value)} placeholder="اسم الإكسسوار..." /></td>
+                                            <td>
+                                                <select className="inner-table-input" value={acc.name} onChange={e => handleAccChange(idx, 'name', e.target.value)}>
+                                                    <option value="">اختر الإكسسوار...</option>
+                                                    {contractOptions.accessoryNames?.map(t => <option key={t} value={t}>{t}</option>)}
+                                                </select>
+                                            </td>
                                             <td><input className="inner-table-input numeric" type="number" value={acc.price} onChange={e => handleAccChange(idx, 'price', e.target.value)} /></td>
                                             <td><input className="inner-table-input numeric" type="number" value={acc.count} onChange={e => handleAccChange(idx, 'count', e.target.value)} /></td>
                                             <td><input className="inner-table-input numeric result-field" disabled type="text" value={acc.total} /></td>

@@ -15,8 +15,8 @@ import {
 } from 'lucide-react';
 
 const SettingsScreen = () => {
-    const { users, addUser, updateUser, deleteUser, systemSettings, updateSettings, defaultPermissions, currentUser } = useApp();
-    const [activeTab, setActiveTab] = useState('system'); // 'system' or 'users'
+    const { users, addUser, updateUser, deleteUser, systemSettings, updateSettings, defaultPermissions, currentUser, contractOptions, updateContractOptions } = useApp();
+    const [activeTab, setActiveTab] = useState('system'); // 'system', 'users', or 'contract-terms'
     const [showUserModal, setShowUserModal] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [newUser, setNewUser] = useState({ name: '', username: '', password: '', role: 'engineer', permissions: { ...defaultPermissions } });
@@ -81,6 +81,13 @@ const SettingsScreen = () => {
                         <UsersIcon size={18} />
                         <span>إدارة المستخدمين</span>
                     </button>
+                    <button
+                        className={`settings-nav-item ${activeTab === 'contract-terms' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('contract-terms')}
+                    >
+                        <Building size={18} />
+                        <span>بنود التعاقد</span>
+                    </button>
                 </div>
 
                 <div className="settings-content">
@@ -144,6 +151,53 @@ const SettingsScreen = () => {
                                     حفظ التغييرات
                                 </button>
                             </form>
+                        </div>
+                    ) : activeTab === 'contract-terms' ? (
+                        <div className="settings-panel fade-in">
+                            <h3><Building size={20} className="text-primary" /> إدارة بنود التعاقد</h3>
+                            <p className="text-secondary" style={{ marginBottom: '20px' }}>أضف أو احذف الخيارات التي تظهر في قوائم الاختيار في نماذج التعاقد.</p>
+
+                            <div className="terms-management-grid">
+                                {Object.entries({
+                                    projectTypes: 'أنواع المشاريع',
+                                    woodTypes: 'أنواع الخشب',
+                                    innerShellTypes: 'أنواع العلب الداخلية',
+                                    hingeTypes: 'أنواع المفصلات',
+                                    slideTypes: 'أنواع المجر',
+                                    handleTypes: 'أنواع المقابض',
+                                    accessoryNames: 'أسماء الإكسسوارات'
+                                }).map(([key, label]) => (
+                                    <div key={key} className="term-category-card glass">
+                                        <h4>{label}</h4>
+                                        <div className="term-items-list">
+                                            {contractOptions[key]?.map((item, idx) => (
+                                                <div key={idx} className="term-item-pill">
+                                                    <span>{item}</span>
+                                                    <button onClick={() => {
+                                                        const newOptions = { ...contractOptions };
+                                                        newOptions[key] = newOptions[key].filter((_, i) => i !== idx);
+                                                        updateContractOptions(newOptions);
+                                                    }} className="pill-remove">×</button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="add-term-input">
+                                            <input
+                                                type="text"
+                                                placeholder="إضافة خيار..."
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' && e.target.value.trim()) {
+                                                        const newOptions = { ...contractOptions };
+                                                        newOptions[key] = [...(newOptions[key] || []), e.target.value.trim()];
+                                                        updateContractOptions(newOptions);
+                                                        e.target.value = '';
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     ) : (
                         <div className="settings-panel fade-in">
@@ -428,6 +482,66 @@ const SettingsScreen = () => {
                 .btn-small {
                     padding: 8px 16px;
                     font-size: 13px;
+                }
+                .terms-management-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                    gap: 20px;
+                }
+                .term-category-card {
+                    padding: 20px;
+                    border-radius: 12px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 15px;
+                }
+                .term-category-card h4 {
+                    color: var(--primary);
+                    font-size: 16px;
+                    border-bottom: 1px solid var(--border-color);
+                    padding-bottom: 8px;
+                }
+                .term-items-list {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 8px;
+                    min-height: 40px;
+                }
+                .term-item-pill {
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid var(--border-color);
+                    padding: 4px 12px;
+                    border-radius: 20px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 13px;
+                }
+                .pill-remove {
+                    background: transparent;
+                    border: none;
+                    color: var(--text-secondary);
+                    cursor: pointer;
+                    font-size: 16px;
+                    line-height: 1;
+                    padding: 0;
+                }
+                .pill-remove:hover {
+                    color: #ef4444;
+                }
+                .add-term-input input {
+                    width: 100%;
+                    background: rgba(0, 0, 0, 0.2);
+                    border: 1px dashed var(--border-color);
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    font-size: 13px;
+                    color: white;
+                }
+                .add-term-input input:focus {
+                    border-color: var(--primary);
+                    outline: none;
+                    background: rgba(0, 0, 0, 0.3);
                 }
             `}</style>
         </div>

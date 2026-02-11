@@ -114,6 +114,19 @@ export const AppProvider = ({ children }) => {
         };
     });
 
+    const [contractOptions, setContractOptions] = useState(() => {
+        const saved = localStorage.getItem('kitchinz_contract_options');
+        return saved ? JSON.parse(saved) : {
+            projectTypes: ['مطبخ', 'دريسنج', 'وحدات حمام', 'أخرى'],
+            woodTypes: ['HPL', 'UV', 'قشرة طبيعي', 'أكريليك', 'بولي لاك', 'سوبر جلوس'],
+            innerShellTypes: ['أبيض فايبر', 'خشبي فايبر', 'أبيض ميلامين', 'خشبي ميلامين'],
+            hingeTypes: ['إغلاق هادئ (Soft Close)', 'عادي'],
+            slideTypes: ['إغلاق هادئ (Soft Close)', 'عادي'],
+            handleTypes: ['داخلي (G-Line)', 'خارجي متصل', 'خارجي منفصل'],
+            accessoryNames: ['سلة مهملات', 'صفاية أطباق', 'منظم أدراج', 'إضاءة لد']
+        };
+    });
+
     const [isCloudLoading, setIsCloudLoading] = useState(true);
 
     // Migration & Real-time Sync Logic (Supabase)
@@ -139,7 +152,8 @@ export const AppProvider = ({ children }) => {
                 { name: 'transactions', state: transactions, setter: setTransactions },
                 { name: 'accounts', state: accounts, setter: setAccounts },
                 { name: 'employees', state: employees, setter: setEmployees },
-                { name: 'recurring', state: recurringExpenses, setter: setRecurringExpenses }
+                { name: 'recurring', state: recurringExpenses, setter: setRecurringExpenses },
+                { name: 'contract_options', state: contractOptions, setter: setContractOptions, isSingle: true }
             ];
 
             // 1. Initial Migration Check (LocalStorage to Supabase)
@@ -221,6 +235,10 @@ export const AppProvider = ({ children }) => {
     useEffect(() => {
         localStorage.setItem('kitchinz_settings', JSON.stringify(systemSettings));
     }, [systemSettings]);
+
+    useEffect(() => {
+        localStorage.setItem('kitchinz_contract_options', JSON.stringify(contractOptions));
+    }, [contractOptions]);
 
     useEffect(() => {
         if (currentUser) {
@@ -902,6 +920,13 @@ export const AppProvider = ({ children }) => {
         } catch (e) { console.error(e); }
     };
 
+    const updateContractOptions = async (newOptions) => {
+        setContractOptions(newOptions);
+        try {
+            if (supabase) await supabase.from('contract_options').upsert({ id: 'global', ...newOptions });
+        } catch (e) { console.error(e); }
+    };
+
     // Migration: Ensure all admins have new permissions when they are added to the system
     useEffect(() => {
         setUsers(prev => prev.map(u => {
@@ -957,6 +982,8 @@ export const AppProvider = ({ children }) => {
             deleteUser,
             systemSettings,
             updateSettings,
+            contractOptions,
+            updateContractOptions,
             currentUser,
             login,
             logout,

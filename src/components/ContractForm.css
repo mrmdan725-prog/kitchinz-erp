@@ -311,6 +311,33 @@
     border-bottom: 2px solid #334155;
 }
 
+/* Wood Specs Table Column Widths */
+.wood-specs-table th:nth-child(1) {
+    width: 140px;
+}
+
+/* الصنف */
+.wood-specs-table th:nth-child(2) {
+    width: 220px;
+}
+
+/* النوع - جعلناه أكبر */
+.wood-specs-table th:nth-child(3) {
+    width: 100px;
+}
+
+/* إجمالي المساحة - جعلناه أصغر */
+.wood-specs-table th:nth-child(4) {
+    width: 120px;
+}
+
+/* سعر المتر */
+.wood-specs-table th:nth-child(5) {
+    width: 140px;
+}
+
+/* إجمالي السعر */
+
 .premium-form-table td {
     padding: 10px 15px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -332,19 +359,29 @@
 
 .inner-table-input {
     width: 100%;
-    border: 1px solid transparent;
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 14px;
-    background: rgba(0, 0, 0, 0.1);
+    border: 1.5px solid #334155;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 15px;
+    background: #0f172a;
     color: #f8fafc;
     transition: all 0.2s ease;
     outline: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+select.inner-table-input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2346AE4C' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 12px center;
+    padding-left: 40px;
 }
 
 .inner-table-input:focus {
     border-color: #46AE4C;
-    background: #0f172a;
+    background: #1e293b;
+    box-shadow: 0 0 0 4px rgba(70, 174, 76, 0.2);
 }
 
 .inner-table-input.numeric {
