@@ -299,28 +299,32 @@ export const AppProvider = ({ children }) => {
             // 1. Initial Migration Check (LocalStorage to Supabase)
             try {
                 for (const tableSpec of tablesToSync) {
-                    console.log(`🔍 Checking sync for ${tableSpec.name}...`);
-                    const { data: existingData, error } = await supabase.from(tableSpec.name).select('*');
+                    try {
+                        console.log(`🔍 Checking sync for ${tableSpec.name}...`);
+                        const { data: existingData, error } = await supabase.from(tableSpec.name).select('*');
 
-                    if (error) {
-                        console.error(`❌ Error fetching ${tableSpec.name}:`, error);
-                        continue; // Skip this table and try next
-                    }
+                        if (error) {
+                            console.error(`❌ Error fetching ${tableSpec.name}:`, error);
+                            continue;
+                        }
 
-                    if ((!existingData || existingData.length === 0) && tableSpec.state.length > 0) {
-                        console.log(`📤 Migrating local ${tableSpec.name} to Supabase...`);
-                        const dataToInsert = tableSpec.isSingle ? [tableSpec.state] : tableSpec.state.slice(0, 50); // Batch limit
-                        const { error: insertError } = await supabase.from(tableSpec.name).insert(dataToInsert);
-                        if (insertError) console.error(`❌ Migration failed for ${tableSpec.name}:`, insertError);
-                        else console.log(`✅ Migration successful for ${tableSpec.name}`);
-                    } else if (existingData && existingData.length > 0) {
-                        console.log(`📥 Loading ${existingData.length} records for ${tableSpec.name} from cloud`);
-                        if (tableSpec.isSingle) tableSpec.setter(existingData[0]);
-                        else tableSpec.setter(existingData);
+                        if ((!existingData || existingData.length === 0) && tableSpec.state.length > 0) {
+                            console.log(`📤 Migrating local ${tableSpec.name} to Supabase...`);
+                            const dataToInsert = tableSpec.isSingle ? [tableSpec.state] : tableSpec.state.slice(0, 50);
+                            const { error: insertError } = await supabase.from(tableSpec.name).insert(dataToInsert);
+                            if (insertError) console.error(`❌ Migration failed for ${tableSpec.name}:`, insertError);
+                            else console.log(`✅ Migration successful for ${tableSpec.name}`);
+                        } else if (existingData && existingData.length > 0) {
+                            console.log(`📥 Loading ${existingData.length} records for ${tableSpec.name} from cloud`);
+                            if (tableSpec.isSingle) tableSpec.setter(existingData[0]);
+                            else tableSpec.setter(existingData);
+                        }
+                    } catch (tableErr) {
+                        console.error(`❌ Unexpected error syncing table ${tableSpec.name}:`, tableErr);
                     }
                 }
             } catch (err) {
-                console.warn("⚠️ Supabase sync interrupted. System will continue with local data.", err);
+                console.warn("⚠️ Supabase sync loop interrupted.", err);
             } finally {
                 setIsCloudLoading(false);
             }
