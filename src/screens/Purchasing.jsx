@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Plus, ShoppingCart, Calendar, User, Package, Edit, Trash2, Receipt, FileText, Upload, X, FileSpreadsheet } from 'lucide-react';
+import { Plus, ShoppingCart, Calendar, User, Package, Edit, Trash2, Receipt, FileText, Upload, X, FileSpreadsheet, LayoutGrid, List, Search } from 'lucide-react';
 import { exportToExcel, formatters } from '../utils/excelExport';
 
 const Purchasing = () => {
@@ -13,12 +13,16 @@ const Purchasing = () => {
         deletePurchase,
         inventory,
         addInvoice,
-        systemSettings
+        systemSettings,
+        contractOptions
     } = useApp();
     const [showModal, setShowModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [viewMode, setViewMode] = useState('list'); // 'grid' or 'list'
     const [formData, setFormData] = useState({
+        date: new Date().toISOString().split('T')[0],
         materialName: '',
         quantity: '',
         unitPrice: '',
@@ -26,11 +30,13 @@ const Purchasing = () => {
         supplier: '',
         account: accounts[0]?.name || 'الخزنة الرئيسية',
         notes: '',
+        unit: 'متر مربع',
         invoiceFile: null // base64 string
     });
 
     const handleEdit = (purchase) => {
         setFormData({
+            date: purchase.date.split('T')[0],
             materialName: purchase.materialName,
             quantity: purchase.quantity,
             unitPrice: purchase.unitPrice,
@@ -38,6 +44,7 @@ const Purchasing = () => {
             supplier: purchase.supplier || '',
             account: purchase.account || accounts[0]?.name || 'الخزنة الرئيسية',
             notes: purchase.notes || '',
+            unit: purchase.unit || 'متر مربع',
             invoiceFile: purchase.invoiceFile || null
         });
         setIsEditing(true);
@@ -70,6 +77,7 @@ const Purchasing = () => {
         setIsEditing(false);
         setEditId(null);
         setFormData({
+            date: new Date().toISOString().split('T')[0],
             materialName: '',
             quantity: '',
             unitPrice: '',
@@ -77,6 +85,7 @@ const Purchasing = () => {
             supplier: '',
             account: accounts[0]?.name || 'الخزنة الرئيسية',
             notes: '',
+            unit: 'متر مربع',
             invoiceFile: null
         });
     };
@@ -112,7 +121,7 @@ const Purchasing = () => {
             status: 'draft',
             relatedId: purchase.id,
             items: [
-                { description: `شراء خامة: ${purchase.materialName}`, quantity: purchase.quantity, unitPrice: purchase.unitPrice, total: total }
+                { description: `شراء خامة: ${purchase.materialName} (${purchase.unit})`, quantity: purchase.quantity, unitPrice: purchase.unitPrice, total: total }
             ],
             subtotal: total,
             taxAmount: (total * (systemSettings.taxRate || 14)) / 100,
@@ -123,15 +132,24 @@ const Purchasing = () => {
         alert('تم إنشاء مسودة الفاتورة بنجاح.');
     };
 
+    const filteredPurchases = purchases.filter(p => {
+        return p.materialName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (p.supplier && p.supplier.toLowerCase().includes(searchTerm.toLowerCase()));
+    });
+
     const handleExport = () => {
-        const dataToExport = purchases.map(formatters.purchase);
+        const dataToExport = filteredPurchases.map(formatters.purchase);
         exportToExcel(dataToExport, 'مشتريات_المواد', 'المشتريات');
     };
 
     return (
         <div className="page arabic-text">
             <div className="page-header">
-                <h2>مشتريات المواد</h2>
+                <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                    <ShoppingCart size={24} className="text-primary" />
+                    <h2>مشتريات المواد</h2>
+                </div>
                 <div style={{ display: 'flex', gap: '10px' }}>
                     <button className="btn-export-excel" onClick={handleExport} title="تصدير لإكسل">
                         <FileSpreadsheet size={18} />
@@ -139,8 +157,26 @@ const Purchasing = () => {
                     </button>
                     <button className="btn-primary" onClick={() => setShowModal(true)}>
                         <Plus size={18} />
-                        تسجيل عملية شراء
+                        تسجيل شراء
                     </button>
+                </div>
+            </div>
+
+            <div className="header-search-box glass" style={{ marginBottom: '20px', width: '100%', maxWidth: '100%', background: 'rgba(255,255,255,0.03)' }}>
+                <Search size={20} style={{ color: 'var(--text-dim)', marginLeft: '10px' }} />
+                <input
+                    type="text"
+                    placeholder="البحث باسم المادة، العميل، أو المورد..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{ background: 'transparent', border: 'none', color: 'white', width: '100%', padding: '10px' }}
+                />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '15px' }}>
+                <div className="layout-toggle">
+                    <button className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`} onClick={() => setViewMode('list')} title="عرض الجدول"><List size={18} /></button>
+                    <button className={`toggle-btn ${viewMode === 'grid' ? 'active' : ''}`} onClick={() => setViewMode('grid')} title="عرض المربعات"><LayoutGrid size={18} /></button>
                 </div>
             </div>
 
@@ -161,65 +197,103 @@ const Purchasing = () => {
                 </div>
             </div>
 
-            <div className="table-container glass">
-                <table className="data-table" dir="rtl" style={{ textAlign: 'right' }}>
-                    <thead>
-                        <tr>
-                            <th style={{ textAlign: 'right' }}>التاريخ</th>
-                            <th style={{ textAlign: 'right' }}>المادة</th>
-                            <th style={{ textAlign: 'right' }}>الكمية</th>
-                            <th style={{ textAlign: 'right' }}>السعر</th>
-                            <th style={{ textAlign: 'right' }}>العميل</th>
-                            <th style={{ textAlign: 'right' }}>المورد</th>
-                            <th style={{ textAlign: 'right' }}>الإجمالي</th>
-                            <th style={{ textAlign: 'right' }}>إجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {purchases.map(purchase => (
-                            <tr key={purchase.id}>
-                                <td>{new Date(purchase.date).toLocaleDateString()}</td>
-                                <td>{purchase.materialName}</td>
-                                <td>{purchase.quantity}</td>
-                                <td>{purchase.unitPrice} ج.م</td>
-                                <td>
-                                    <div className="cell-flex">
-                                        <User size={14} className="text-primary" />
-                                        {purchase.customerName}
-                                    </div>
-                                </td>
-                                <td>{purchase.supplier}</td>
-                                <td className="text-primary font-bold">
-                                    {(Number(purchase.quantity) * Number(purchase.unitPrice)).toLocaleString()} ج.م
-                                </td>
-                                <td>
-                                    <div className="flex gap-2">
-                                        {purchase.invoiceFile && (
-                                            <button className="btn-icon small text-primary" title="عرض الفاتورة المرفقة" onClick={() => viewInvoice(purchase.invoiceFile)}>
-                                                <FileText size={14} />
-                                            </button>
-                                        )}
-                                        <button className="btn-icon small" title="إصدار فاتورة" onClick={() => handleGenerateInvoice(purchase)}>
-                                            <Receipt size={14} />
-                                        </button>
-                                        <button className="btn-icon small" onClick={() => handleEdit(purchase)}>
-                                            <Edit size={14} />
-                                        </button>
-                                        <button className="btn-icon small text-danger" onClick={() => handleDelete(purchase.id)}>
-                                            <Trash2 size={14} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                        {purchases.length === 0 && (
+            {viewMode === 'list' ? (
+                <div className="table-container glass">
+                    <table className="data-table" dir="rtl" style={{ textAlign: 'right' }}>
+                        <thead>
                             <tr>
-                                <td colSpan="8" className="text-center">لا توجد عمليات شراء مسجلة حتى الآن.</td>
+                                <th>التاريخ</th>
+                                <th>المادة</th>
+                                <th>الكمية</th>
+                                <th>السعر</th>
+                                <th>العميل</th>
+                                <th>المورد</th>
+                                <th>الإجمالي</th>
+                                <th className="text-center">إجراءات</th>
                             </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {filteredPurchases.map(purchase => (
+                                <tr key={purchase.id}>
+                                    <td>{new Date(purchase.date).toLocaleDateString()}</td>
+                                    <td>{purchase.materialName}</td>
+                                    <td>{purchase.quantity} <small className="text-secondary">{purchase.unit}</small></td>
+                                    <td>{purchase.unitPrice} ج.م</td>
+                                    <td>
+                                        <div className="cell-flex">
+                                            <User size={14} className="text-primary" />
+                                            {purchase.customerName}
+                                        </div>
+                                    </td>
+                                    <td>{purchase.supplier}</td>
+                                    <td className="text-primary font-bold">
+                                        {(Number(purchase.quantity) * Number(purchase.unitPrice)).toLocaleString()} ج.م
+                                    </td>
+                                    <td>
+                                        <div className="table-actions">
+                                            {purchase.invoiceFile && (
+                                                <button className="btn-icon-action view-btn" title="عرض الفاتورة المرفقة" onClick={() => viewInvoice(purchase.invoiceFile)}>
+                                                    <FileText size={16} />
+                                                </button>
+                                            )}
+                                            <button className="btn-icon-action" title="إصدار فاتورة" onClick={() => handleGenerateInvoice(purchase)}>
+                                                <Receipt size={16} />
+                                            </button>
+                                            <button className="btn-icon-action" onClick={() => handleEdit(purchase)} title="تعديل">
+                                                <Edit size={16} />
+                                            </button>
+                                            <button className="btn-icon-action delete-btn" onClick={() => handleDelete(purchase.id)} title="حذف">
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                            {filteredPurchases.length === 0 && (
+                                <tr>
+                                    <td colSpan="8" className="text-center">لا توجد عمليات شراء مسجلة تطابق البحث.</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            ) : (
+                <div className="grid">
+                    {filteredPurchases.length === 0 ? (
+                        <div className="card glass text-center" style={{ gridColumn: '1 / -1', padding: '60px' }}>
+                            <ShoppingCart size={48} className="text-secondary" style={{ margin: '0 auto 16px' }} />
+                            <p className="text-secondary">لا توجد عمليات شراء تطابق البحث</p>
+                        </div>
+                    ) : (
+                        filteredPurchases.map(purchase => (
+                            <div key={purchase.id} className="card glass purchase-card-enhanced">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
+                                    <span style={{ fontSize: '12px', color: 'var(--text-dim)' }}>{new Date(purchase.date).toLocaleDateString()}</span>
+                                    <span className="badge" style={{ fontSize: '10px', background: 'rgba(70, 174, 76, 0.1)', color: '#46ae4c' }}>
+                                        {purchase.supplier || 'بدون مورد'}
+                                    </span>
+                                </div>
+                                <h4 style={{ marginBottom: '5px' }}>{purchase.materialName}</h4>
+                                <div style={{ fontSize: '12px', color: 'var(--text-dim)', marginBottom: '15px' }}>
+                                    {purchase.customerName} • {purchase.quantity} {purchase.unit}
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--glass-border)', paddingTop: '15px' }}>
+                                    <span style={{ fontWeight: '700', color: 'var(--primary)' }}>
+                                        {(Number(purchase.quantity) * Number(purchase.unitPrice)).toLocaleString()} ج.م
+                                    </span>
+                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                        {purchase.invoiceFile && (
+                                            <button className="btn-icon-action" onClick={() => viewInvoice(purchase.invoiceFile)} title="عرض الفاتورة"><FileText size={16} /></button>
+                                        )}
+                                        <button className="btn-icon-action" onClick={() => handleEdit(purchase)} title="تعديل"><Edit size={16} /></button>
+                                        <button className="btn-icon-action delete-btn" onClick={() => handleDelete(purchase.id)} title="حذف"><Trash2 size={16} /></button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            )}
 
             {showModal && (
                 <div className="modal-overlay">
@@ -227,6 +301,15 @@ const Purchasing = () => {
                         <h3>{isEditing ? 'تعديل عملية شراء' : 'تسجيل عملية شراء جديدة'}</h3>
                         <form onSubmit={handleSubmit}>
                             <div className="form-grid">
+                                <div className="form-group">
+                                    <label>تاريخ العملية</label>
+                                    <input
+                                        required
+                                        type="date"
+                                        value={formData.date}
+                                        onChange={e => setFormData({ ...formData, date: e.target.value })}
+                                    />
+                                </div>
                                 <div className="form-group">
                                     <label>اسم المادة</label>
                                     <input
@@ -249,7 +332,15 @@ const Purchasing = () => {
                                     <select
                                         required
                                         value={formData.customerId}
-                                        onChange={e => setFormData({ ...formData, customerId: e.target.value })}
+                                        onChange={e => {
+                                            const custId = e.target.value;
+                                            const customer = customers.find(c => c.id === custId);
+                                            setFormData({
+                                                ...formData,
+                                                customerId: custId,
+                                                account: customer ? customer.name : (accounts[0]?.name || 'الخزنة الرئيسية')
+                                            });
+                                        }}
                                     >
                                         <option value="">اختر العميل</option>
                                         {customers.map(c => (
@@ -264,6 +355,17 @@ const Purchasing = () => {
                                 <div className="form-group">
                                     <label>سعر الوحدة</label>
                                     <input required type="number" step="0.01" value={formData.unitPrice} onChange={e => setFormData({ ...formData, unitPrice: e.target.value })} />
+                                </div>
+                                <div className="form-group">
+                                    <label>الوحدة</label>
+                                    <select
+                                        value={formData.unit}
+                                        onChange={e => setFormData({ ...formData, unit: e.target.value })}
+                                    >
+                                        {contractOptions.units?.map(u => (
+                                            <option key={u} value={u}>{u}</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div className="form-group">
                                     <label>المورد</label>

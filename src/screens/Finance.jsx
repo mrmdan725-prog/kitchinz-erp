@@ -19,7 +19,10 @@ import {
     X,
     Users,
     ExternalLink,
-    FileSpreadsheet
+    FileSpreadsheet,
+    LayoutGrid,
+    List,
+    FileText
 } from 'lucide-react';
 import { exportToExcel, formatters } from '../utils/excelExport';
 
@@ -54,6 +57,7 @@ const Finance = () => {
     const [showFilters, setShowFilters] = useState(false);
     const [filterType, setFilterType] = useState('all');
     const [dateRange, setDateRange] = useState({ start: '', end: '' });
+    const [viewMode, setViewMode] = useState('list'); // 'grid' or 'list'
 
     const [newAdjustment, setNewAdjustment] = useState({
         newBalance: '',
@@ -244,17 +248,63 @@ const Finance = () => {
 
     return (
         <div className="page dashboard-fade-in">
-            <div className="page-header">
-                <div>
-                    <h2>المالية والمحاسبة</h2>
-                    <p className="text-secondary">إدارة الحسابات، التدفقات النقدية والتقارير المالية</p>
+            <div className="module-header">
+                <div className="module-info">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
+                        <div className="legendary-icon-container" style={{ background: 'rgba(255,255,255,0.1)', padding: '10px', borderRadius: '12px' }}>
+                            <TrendingUp size={24} color="white" />
+                        </div>
+                        <h1 style={{ fontSize: '24px' }}>المالية والمحاسبة</h1>
+                    </div>
+                    <p>إدارة الحسابات، التدفقات النقدية والتقارير المالية باحترافية.</p>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginTop: '20px' }}>
+                        <div className="header-search-box" style={{ position: 'relative', flex: 1, maxWidth: '400px' }}>
+                            <Search size={18} style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
+                            <input
+                                type="text"
+                                placeholder="بحث في العمليات..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="glass"
+                                style={{
+                                    width: '100%',
+                                    padding: '12px 48px 12px 20px',
+                                    borderRadius: '12px',
+                                    border: '1px solid var(--glass-border)',
+                                    background: 'rgba(255,255,255,0.03)',
+                                    color: 'white',
+                                    fontSize: '14px'
+                                }}
+                            />
+                        </div>
+
+                        <div className="layout-toggle">
+                            <button
+                                className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+                                onClick={() => setViewMode('list')}
+                                title="عرض القائمة"
+                            >
+                                <List size={20} />
+                            </button>
+                            <button
+                                className={`toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                                onClick={() => setViewMode('grid')}
+                                title="عرض الشبكة"
+                            >
+                                <LayoutGrid size={20} />
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                    <button className="btn-export-excel" onClick={handleExport} title="تصدير لإكسل">
-                        <FileSpreadsheet size={18} />
+
+                <div className="module-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                    <button className="btn-export-excel glass-interactive" onClick={handleExport} style={{ height: '40px', padding: '0 16px', borderRadius: '10px' }}>
+                        <FileSpreadsheet size={16} />
                         تصدير البيانات
                     </button>
-                    <button className="btn-primary" onClick={() => setShowAddModal(true)}>
+
+                    <button className="btn-primary" onClick={() => setShowAddModal(true)} style={{ height: '40px', padding: '0 20px', borderRadius: '10px', boxShadow: '0 8px 16px rgba(68, 184, 92, 0.2)' }}>
                         <Plus size={20} />
                         <span>إضافة عملية مالية</span>
                     </button>
@@ -302,7 +352,7 @@ const Finance = () => {
                             <CreditCard size={20} className="text-primary" />
                             <h3>حسابات المعرض</h3>
                         </div>
-                        <button className="btn-icon" title="إدارة الحسابات" onClick={() => setShowAccountModal(true)}>
+                        <button className="btn-icon-action" title="إدارة الحسابات" onClick={() => setShowAccountModal(true)}>
                             <SettingsIcon size={18} />
                         </button>
                     </div>
@@ -319,8 +369,8 @@ const Finance = () => {
                                     <div className="account-details">
                                         <span className="account-name">{acc.name}</span>
                                         <div className="account-actions">
-                                            <button className="btn-icon small" onClick={(e) => { e.stopPropagation(); startEditAccount(acc); }}><Edit size={12} /></button>
-                                            <button className="btn-icon small text-danger" onClick={(e) => { e.stopPropagation(); deleteAccount(acc.id); }}><Trash2 size={12} /></button>
+                                            <button className="btn-icon-action" onClick={(e) => { e.stopPropagation(); startEditAccount(acc); }} title="تعديل"><Edit size={14} /></button>
+                                            <button className="btn-icon-action delete-btn" onClick={(e) => { e.stopPropagation(); deleteAccount(acc.id); }} title="حذف"><Trash2 size={14} /></button>
                                         </div>
                                     </div>
                                     <span className="account-balance">{(acc.balance || 0).toLocaleString()} ج.م</span>
@@ -462,14 +512,6 @@ const Finance = () => {
             {/* Transactions Table */}
             <div className="table-container" style={{ marginTop: '32px' }}>
                 <div className="table-header-tools">
-                    <div className="search-bar" style={{ margin: 0, border: 'none', background: 'transparent' }}>
-                        <Search size={18} className="text-secondary" />
-                        <input
-                            placeholder="بحث في العمليات..."
-                            value={searchTerm}
-                            onChange={e => setSearchTerm(e.target.value)}
-                        />
-                    </div>
                     <div className="filter-group">
                         {(filterType !== 'all' || dateRange.start || dateRange.end) && (
                             <button
@@ -537,51 +579,87 @@ const Finance = () => {
                         </div>
                     </div>
                 )}
-                <table className="data-table">
-                    <thead>
-                        <tr>
-                            <th>التاريخ</th>
-                            <th>البيان</th>
-                            <th>الحساب</th>
-                            <th>النوع</th>
-                            <th>المبلغ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredTransactions.map(t => (
-                            <tr key={t.id}>
-                                <td>{new Date(t.date).toLocaleDateString('ar-EG')}</td>
-                                <td>
-                                    <div style={{ fontWeight: '500' }}>{t.category}</div>
-                                    <div className="text-secondary" style={{ fontSize: '12px' }}>{t.notes}</div>
-                                </td>
-                                <td>{t.account}</td>
-                                <td>
-                                    <span className={`badge ${t.type === 'income' ? 'badge-success' : 'badge-danger'}`}>
-                                        {t.type === 'income' ? (
-                                            <><ArrowDownLeft size={12} /> وارد</>
-                                        ) : (
-                                            <><ArrowUpRight size={12} /> صادر</>
-                                        )}
-                                    </span>
-                                </td>
-                                <td style={{ fontWeight: '700' }} className={t.type === 'income' ? 'text-success' : 'text-danger'}>
-                                    {t.type === 'income' ? '+' : '-'}{parseFloat(t.amount).toLocaleString()} ج.م
-                                </td>
-                                <td>
-                                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                                        <button className="btn-icon small" title="تعديل" onClick={() => startEditTransaction(t)}>
-                                            <Edit size={12} />
-                                        </button>
-                                        <button className="btn-icon small text-danger" title="حذف" onClick={() => setTransactionToDelete(t)}>
-                                            <Trash2 size={12} />
-                                        </button>
-                                    </div>
-                                </td>
+                {viewMode === 'list' ? (
+                    <table className="data-table">
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>البيان</th>
+                                <th>الحساب</th>
+                                <th className="text-center">النوع</th>
+                                <th>المبلغ</th>
+                                <th className="text-center">الإجراءات</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {filteredTransactions.map(t => (
+                                <tr key={t.id}>
+                                    <td>{new Date(t.date).toLocaleDateString('ar-EG')}</td>
+                                    <td>
+                                        <div style={{ fontWeight: '500' }}>{t.category}</div>
+                                        <div className="text-secondary" style={{ fontSize: '12px' }}>{t.notes}</div>
+                                    </td>
+                                    <td>{t.account}</td>
+                                    <td className="text-center">
+                                        <span className={`badge ${t.type === 'income' ? 'badge-success' : 'badge-danger'}`}>
+                                            {t.type === 'income' ? (
+                                                <><ArrowDownLeft size={12} /> وارد</>
+                                            ) : (
+                                                <><ArrowUpRight size={12} /> صادر</>
+                                            )}
+                                        </span>
+                                    </td>
+                                    <td style={{ fontWeight: '700' }} className={t.type === 'income' ? 'text-success' : 'text-danger'}>
+                                        {t.type === 'income' ? '+' : '-'}{parseFloat(t.amount).toLocaleString()} ج.م
+                                    </td>
+                                    <td>
+                                        <div className="table-actions">
+                                            <button className="btn-icon-action" title="تعديل" onClick={() => startEditTransaction(t)}>
+                                                <Edit size={16} />
+                                            </button>
+                                            <button className="btn-icon-action delete-btn" title="حذف" onClick={() => setTransactionToDelete(t)}>
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (
+                    <div className="grid">
+                        {filteredTransactions.length === 0 ? (
+                            <div className="card glass text-center" style={{ gridColumn: '1 / -1', padding: '60px' }}>
+                                <TrendingUp size={48} className="text-secondary" style={{ margin: '0 auto 16px' }} />
+                                <p className="text-secondary">لا توجد عمليات تطابق البحث</p>
+                            </div>
+                        ) : (
+                            filteredTransactions.map(t => (
+                                <div key={t.id} className="card glass transaction-card-enhanced">
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
+                                        <span style={{ fontSize: '12px', color: 'var(--text-dim)' }}>{new Date(t.date).toLocaleDateString('ar-EG')}</span>
+                                        <span className={`badge ${t.type === 'income' ? 'badge-success' : 'badge-danger'}`} style={{ fontSize: '10px' }}>
+                                            {t.type === 'income' ? 'وارد' : 'صادر'}
+                                        </span>
+                                    </div>
+                                    <h4 style={{ marginBottom: '5px' }}>{t.category}</h4>
+                                    <div style={{ fontSize: '12px', color: 'var(--text-dim)', marginBottom: '15px' }}>
+                                        {t.account} • {t.notes || 'بدون ملاحظات'}
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--glass-border)', paddingTop: '15px' }}>
+                                        <span style={{ fontWeight: '700' }} className={t.type === 'income' ? 'text-success' : 'text-danger'}>
+                                            {t.type === 'income' ? '+' : '-'}{parseFloat(t.amount).toLocaleString()} ج.م
+                                        </span>
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <button className="btn-icon-action" onClick={() => startEditTransaction(t)}><Edit size={14} /></button>
+                                            <button className="btn-icon-action delete-btn" onClick={() => setTransactionToDelete(t)}><Trash2 size={14} /></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Add Transaction Modal */}

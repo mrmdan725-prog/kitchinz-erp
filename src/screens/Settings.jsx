@@ -139,6 +139,28 @@ const SettingsScreen = () => {
                                             onChange={e => setTempSettings({ ...tempSettings, phone: e.target.value })}
                                         />
                                     </div>
+                                    <div className="form-group">
+                                        <label>إسم ممثل الشركة الافتراضي</label>
+                                        <div className="input-with-icon">
+                                            <User size={16} />
+                                            <input
+                                                type="text"
+                                                value={tempSettings.representativeName || ''}
+                                                onChange={e => setTempSettings({ ...tempSettings, representativeName: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>الرقم القومي للممثل</label>
+                                        <div className="input-with-icon">
+                                            <Shield size={16} />
+                                            <input
+                                                type="text"
+                                                value={tempSettings.representativeNationalId || ''}
+                                                onChange={e => setTempSettings({ ...tempSettings, representativeNationalId: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="form-group" style={{ marginTop: '10px' }}>
                                     <label>عنوان المقر</label>
@@ -165,7 +187,12 @@ const SettingsScreen = () => {
                                     hingeTypes: 'أنواع المفصلات',
                                     slideTypes: 'أنواع المجر',
                                     handleTypes: 'أنواع المقابض',
-                                    accessoryNames: 'أسماء الإكسسوارات'
+                                    accessoryNames: 'أسماء الإكسسوارات',
+                                    hangingTypes: 'أنواع التعليقة',
+                                    flipUpTypes: 'أنواع القلابات',
+                                    legTypes: 'أنواع الرجول',
+                                    toeKickTypes: 'أنواع الوزر',
+                                    units: 'وحدات القياس'
                                 }).map(([key, label]) => (
                                     <div key={key} className="term-category-card glass">
                                         <h4>{label}</h4>

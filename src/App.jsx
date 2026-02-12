@@ -175,18 +175,6 @@ const AppContent = () => {
 
   const perms = currentUser.permissions || {};
 
-  const ProtectedRoute = ({ children, perm }) => {
-    if (perm !== undefined && !perm) {
-      return (
-        <div style={{ textAlign: 'center', marginTop: '100px' }}>
-          <h2 style={{ color: '#ff4d4d' }}>عذراً، ليس لديك صلاحية للوصول لهذه الصفحة</h2>
-          <p>يرجى التواصل مع مدير النظام لتعديل صلاحياتك.</p>
-        </div>
-      );
-    }
-    return children;
-  };
-
   return (
     <div className={`app-container ${isMobileMenuOpen ? 'mobile-menu-active' : ''}`} dir="rtl">
       <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} />
@@ -277,10 +265,10 @@ const AppContent = () => {
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
               >
                 <div style={{ textAlign: 'left', marginLeft: '12px' }}>
-                  <span style={{ display: 'block', fontSize: '13px', fontWeight: '700' }}>{currentUser.name}</span>
+                  <span style={{ display: 'block', fontSize: '13px', fontWeight: '700' }}>{currentUser.name || currentUser.username}</span>
                   <span className="text-secondary" style={{ fontSize: '10px' }}>{currentUser.role === 'admin' ? 'مدير نظام' : 'مهندس'}</span>
                 </div>
-                <div className="avatar">{currentUser.name.charAt(0)}</div>
+                <div className="avatar">{(currentUser.name || currentUser.username || '?').charAt(0)}</div>
               </div>
 
               {isUserMenuOpen && (
@@ -352,6 +340,18 @@ const AppContent = () => {
       </main>
     </div>
   );
+};
+
+const ProtectedRoute = ({ children, perm }) => {
+  if (perm !== undefined && !perm) {
+    return (
+      <div style={{ textAlign: 'center', marginTop: '100px' }}>
+        <h2 style={{ color: '#ff4d4d' }}>عذراً، ليس لديك صلاحية للوصول لهذه الصفحة</h2>
+        <p>يرجى التواصل مع مدير النظام لتعديل صلاحياتك.</p>
+      </div>
+    );
+  }
+  return children;
 };
 
 const App = () => {

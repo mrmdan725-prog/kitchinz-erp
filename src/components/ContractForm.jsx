@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, Save, Eye, LogOut } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import './ContractForm.css';
 
 const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
-    const { contractOptions } = useApp();
+    const { contractOptions, systemSettings } = useApp();
+    const isEditing = !!initialData;
     const [formData, setFormData] = useState(() => {
         if (initialData) {
             // Migration logic for old data structures
@@ -53,8 +54,8 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
 
         return {
             contractDate: new Date().toISOString().split('T')[0],
-            representative: '',
-            firstPartyNationalId: '',
+            representative: systemSettings.representativeName || '',
+            firstPartyNationalId: systemSettings.representativeNationalId || '',
             customer: customers[0] || null,
             customerNationalId: '',
             projectType: '',
@@ -151,6 +152,29 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
 
     return (
         <div className="contract-form-container">
+            {/* NEW Premium Header Bar */}
+            <div className="form-header-bar glass">
+                <div className="header-title-info">
+                    <span className="header-badge">{isEditing ? 'تعديل' : 'جديد'}</span>
+                    <h3 className="header-main-title">{isEditing ? 'نموذج تعاقد لعميل' : 'إنشاء نموذج تعاقد جديد'}</h3>
+                </div>
+
+                <div className="header-quick-actions">
+                    <button type="button" className="action-btn-header preview" onClick={() => onSubmit(formData, false)} title="معاينة">
+                        <Eye size={18} />
+                        <span>معاينة</span>
+                    </button>
+                    <button type="button" className="action-btn-header save" onClick={() => onSubmit(formData, true)} title="حفظ كمسودة">
+                        <Save size={18} />
+                        <span>حفظ</span>
+                    </button>
+                    <button type="button" className="action-btn-header exit" onClick={onCancel} title="خروج">
+                        <LogOut size={18} />
+                        <span>خروج</span>
+                    </button>
+                </div>
+            </div>
+
             <div className="form-sections-scroller">
                 {/* 1. Header & Parties Card */}
                 <div className="form-card branding-card">
@@ -160,7 +184,10 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
                                 <span className="brand-logo-text"><span className="brand-primary">K</span>ITCHENZ</span>
                                 <div className="brand-tagline">MORE THAN KITCHENS</div>
                             </div>
-                            <div className="mimic-date-box">
+                            <div className="mimic-date-box" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                <div style={{ fontSize: '10px', color: 'var(--primary)', fontWeight: 'bold', textAlign: 'center' }}>
+                                    {formData.serialNumber ? `رقم العقد: ${formData.serialNumber}` : 'رقم العقد: تلقائي'}
+                                </div>
                                 <label>تاريخ التعاقد</label>
                                 <input type="date" value={formData.contractDate} onChange={e => setFormData({ ...formData, contractDate: e.target.value })} />
                             </div>
@@ -267,6 +294,7 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
                                     <tr className="sum-row">
                                         <td colSpan="4">الإجمالــــــــــــــــــــي</td>
                                         <td className="final-sum">{formData.woodTotal}</td>
+                                        <td></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -274,68 +302,94 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
                     </div>
                 </div>
 
-                {/* 3. Components Card */}
+                {/* 3. Basic Components Card */}
                 <div className="form-card">
                     <div className="card-header">
-                        <span className="card-icon">🛠️</span>
+                        <span className="card-icon">🏗️</span>
                         <span className="card-title">المكونات الأساسية</span>
                     </div>
                     <div className="card-body">
-                        <div className="form-field">
-                            <label>نوع العلب الداخلية</label>
-                            <select className="inner-table-input" value={formData.components.innerShellType} onChange={e => setFormData({ ...formData, components: { ...formData.components, innerShellType: e.target.value } })}>
-                                <option value="">اختر...</option>
-                                {contractOptions.innerShellTypes?.map(t => <option key={t} value={t}>{t}</option>)}
-                            </select>
-                        </div>
-                        <div className="form-field"><label>تعليقة</label><input className="inner-table-input" type="text" value={formData.components.hanging} onChange={e => setFormData({ ...formData, components: { ...formData.components, hanging: e.target.value } })} /></div>
-                        <div className="form-field">
-                            <label>مفصلات</label>
-                            <select className="inner-table-input" value={formData.components.hinges} onChange={e => setFormData({ ...formData, components: { ...formData.components, hinges: e.target.value } })}>
-                                <option value="">اختر...</option>
-                                {contractOptions.hingeTypes?.map(t => <option key={t} value={t}>{t}</option>)}
-                            </select>
-                        </div>
-                        <div className="form-field"><label>قلابات</label><input className="inner-table-input" type="text" value={formData.components.flipUps} onChange={e => setFormData({ ...formData, components: { ...formData.components, flipUps: e.target.value } })} /></div>
-                        <div className="form-field">
-                            <label>مجر</label>
-                            <select className="inner-table-input" value={formData.components.slides} onChange={e => setFormData({ ...formData, components: { ...formData.components, slides: e.target.value } })}>
-                                <option value="">اختر...</option>
-                                {contractOptions.slideTypes?.map(t => <option key={t} value={t}>{t}</option>)}
-                            </select>
-                        </div>
-                        <div className="form-field"><label>رجول</label><input className="inner-table-input" type="text" value={formData.components.legs} onChange={e => setFormData({ ...formData, components: { ...formData.components, legs: e.target.value } })} /></div>
-                        <div className="form-field">
-                            <label>مقابض العلب العلوية</label>
-                            <select className="inner-table-input" value={formData.components.upperHandles} onChange={e => setFormData({ ...formData, components: { ...formData.components, upperHandles: e.target.value } })}>
-                                <option value="">اختر...</option>
-                                {contractOptions.handleTypes?.map(t => <option key={t} value={t}>{t}</option>)}
-                            </select>
-                        </div>
-                        <div className="form-field"><label>وزر</label><input className="inner-table-input" type="text" value={formData.components.toeKick} onChange={e => setFormData({ ...formData, components: { ...formData.components, toeKick: e.target.value } })} /></div>
-                        <div className="form-field">
-                            <label>مقابض العلب السفلية</label>
-                            <select className="inner-table-input" value={formData.components.lowerHandles} onChange={e => setFormData({ ...formData, components: { ...formData.components, lowerHandles: e.target.value } })}>
-                                <option value="">اختر...</option>
-                                {contractOptions.handleTypes?.map(t => <option key={t} value={t}>{t}</option>)}
-                            </select>
-                        </div>
-                        <div className="form-field">
-                            <label>مقابض البلاكار</label>
-                            <select className="inner-table-input" value={formData.components.closetHandles} onChange={e => setFormData({ ...formData, components: { ...formData.components, closetHandles: e.target.value } })}>
-                                <option value="">اختر...</option>
-                                {contractOptions.handleTypes?.map(t => <option key={t} value={t}>{t}</option>)}
-                            </select>
+                        <div className="form-compact-grid">
+                            <div className="form-field">
+                                <label>نوع العلب الداخلية</label>
+                                <select className="inner-table-input" value={formData.components.innerShellType} onChange={e => setFormData({ ...formData, components: { ...formData.components, innerShellType: e.target.value } })}>
+                                    <option value="">اختر...</option>
+                                    {contractOptions.innerShellTypes?.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                            </div>
+                            <div className="form-field">
+                                <label>تعليقة</label>
+                                <select className="inner-table-input" value={formData.components.hanging} onChange={e => setFormData({ ...formData, components: { ...formData.components, hanging: e.target.value } })}>
+                                    <option value="">اختر...</option>
+                                    {contractOptions.hangingTypes?.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                            </div>
+                            <div className="form-field">
+                                <label>مفصلات</label>
+                                <select className="inner-table-input" value={formData.components.hinges} onChange={e => setFormData({ ...formData, components: { ...formData.components, hinges: e.target.value } })}>
+                                    <option value="">اختر...</option>
+                                    {contractOptions.hingeTypes?.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                            </div>
+                            <div className="form-field">
+                                <label>قلابات</label>
+                                <select className="inner-table-input" value={formData.components.flipUps} onChange={e => setFormData({ ...formData, components: { ...formData.components, flipUps: e.target.value } })}>
+                                    <option value="">اختر...</option>
+                                    {contractOptions.flipUpTypes?.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                            </div>
+                            <div className="form-field">
+                                <label>مجر</label>
+                                <select className="inner-table-input" value={formData.components.slides} onChange={e => setFormData({ ...formData, components: { ...formData.components, slides: e.target.value } })}>
+                                    <option value="">اختر...</option>
+                                    {contractOptions.slideTypes?.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                            </div>
+                            <div className="form-field">
+                                <label>رجول</label>
+                                <select className="inner-table-input" value={formData.components.legs} onChange={e => setFormData({ ...formData, components: { ...formData.components, legs: e.target.value } })}>
+                                    <option value="">اختر...</option>
+                                    {contractOptions.legTypes?.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                            </div>
+                            <div className="form-field">
+                                <label>مقابض العلب العلوية</label>
+                                <select className="inner-table-input" value={formData.components.upperHandles} onChange={e => setFormData({ ...formData, components: { ...formData.components, upperHandles: e.target.value } })}>
+                                    <option value="">اختر...</option>
+                                    {contractOptions.handleTypes?.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                            </div>
+                            <div className="form-field">
+                                <label>وزر</label>
+                                <select className="inner-table-input" value={formData.components.toeKick} onChange={e => setFormData({ ...formData, components: { ...formData.components, toeKick: e.target.value } })}>
+                                    <option value="">اختر...</option>
+                                    {contractOptions.toeKickTypes?.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                            </div>
+                            <div className="form-field">
+                                <label>مقابض العلب السفلية</label>
+                                <select className="inner-table-input" value={formData.components.lowerHandles} onChange={e => setFormData({ ...formData, components: { ...formData.components, lowerHandles: e.target.value } })}>
+                                    <option value="">اختر...</option>
+                                    {contractOptions.handleTypes?.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                            </div>
+                            <div className="form-field">
+                                <label>مقابض البلاكار</label>
+                                <select className="inner-table-input" value={formData.components.closetHandles} onChange={e => setFormData({ ...formData, components: { ...formData.components, closetHandles: e.target.value } })}>
+                                    <option value="">اختر...</option>
+                                    {contractOptions.handleTypes?.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* 4. Accessories Card */}
+                {/* 4. Additional Accessories Card */}
                 <div className="form-card">
                     <div className="card-header flex-between">
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <span className="card-icon">✨</span>
-                            <span className="card-title">الإكسسوار الإضافي</span>
+                            <span className="card-icon">🔧</span>
+                            <span className="card-title">إكسسوارات إضافية</span>
                         </div>
                         <button type="button" className="btn-add-item" onClick={handleAddAccessory}>
                             <span className="plus-icon">+</span> إضافة صنف
@@ -343,15 +397,15 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
                     </div>
                     <div className="card-body">
                         <div className="premium-form-table-container">
-                            <table className="premium-form-table wood-specs-table">
+                            <table className="premium-form-table">
                                 <thead>
                                     <tr>
-                                        <th style={{ width: '40px' }}>م</th>
-                                        <th>نوع الإكسسوار</th>
+                                        <th style={{ width: '40px' }}>#</th>
+                                        <th>اسم الصنف</th>
                                         <th style={{ width: '120px' }}>السعر</th>
                                         <th style={{ width: '100px' }}>العدد</th>
-                                        <th style={{ width: '140px' }}>الإجمالي</th>
-                                        <th style={{ width: '40px' }}></th>
+                                        <th style={{ width: '120px' }}>الإجمالي</th>
+                                        <th style={{ width: '60px' }}></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -360,8 +414,8 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
                                             <td className="row-number">{idx + 1}</td>
                                             <td>
                                                 <select className="inner-table-input" value={acc.name} onChange={e => handleAccChange(idx, 'name', e.target.value)}>
-                                                    <option value="">اختر الإكسسوار...</option>
-                                                    {contractOptions.accessoryNames?.map(t => <option key={t} value={t}>{t}</option>)}
+                                                    <option value="">اختر...</option>
+                                                    {contractOptions.accessoryNames?.map(n => <option key={n} value={n}>{n}</option>)}
                                                 </select>
                                             </td>
                                             <td><input className="inner-table-input numeric" type="number" value={acc.price} onChange={e => handleAccChange(idx, 'price', e.target.value)} /></td>
@@ -407,7 +461,7 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
 
                         <div className="payment-installments-grid">
                             <div className="installment-item">
-                                <label>دفع تعاقد (60%)</label>
+                                <label>دفع تعاقت (60%)</label>
                                 <input type="text" value={formData.deposit} onChange={e => setFormData({ ...formData, deposit: e.target.value })} />
                             </div>
                             <div className="installment-item">

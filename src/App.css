@@ -579,6 +579,49 @@ body {
   color: #ff4d4d !important;
 }
 
+.btn-icon-action {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  /* Integrated glass background */
+  color: var(--primary);
+  /* System green by default */
+  border: 1px solid var(--border-glass);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-icon-action:hover {
+  transform: translateY(-3px) scale(1.05);
+  background: rgba(var(--primary-h), var(--primary-s), var(--primary-l), 0.15);
+  border-color: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 8px 15px var(--primary-glow);
+}
+
+.btn-icon-action.delete-btn {
+  color: #ff4d4d;
+}
+
+.btn-icon-action.delete-btn:hover {
+  background: rgba(255, 77, 77, 0.15);
+  border-color: #ff4d4d;
+  color: #ffffff;
+  box-shadow: 0 8px 15px rgba(255, 77, 77, 0.3);
+}
+
+.btn-icon-action.view-btn:hover {
+  background: rgba(52, 152, 219, 0.15);
+  border-color: #3498db;
+  color: #ffffff;
+  box-shadow: 0 8px 15px rgba(52, 152, 219, 0.3);
+}
+
 .text-success {
   color: #28a745 !important;
 }
@@ -616,25 +659,28 @@ body {
   box-shadow: var(--shadow-premium);
 }
 
-.data-table {
+.data-table,
+.modern-table {
   width: 100%;
   border-collapse: collapse;
   text-align: right;
 }
 
-.data-table th {
+.data-table th,
+.modern-table th {
   background: rgba(255, 255, 255, 0.05);
-  padding: 20px 24px;
+  padding: 16px 24px;
   font-weight: 700;
   color: white;
   font-size: 13px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   border-bottom: 1px solid var(--border-glass);
 }
 
-.data-table td {
-  padding: 18px 24px;
+.data-table td,
+.modern-table td {
+  padding: 16px 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
   font-size: 14px;
   color: var(--text-secondary);
@@ -649,7 +695,27 @@ body {
 .cell-flex {
   display: flex;
   align-items: center;
+  gap: 12px;
+}
+
+/* Alignment Utilities */
+.text-center {
+  text-align: center !important;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.table-actions {
+  display: flex;
   gap: 8px;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Modal - Refined & Creative */
@@ -1494,5 +1560,81 @@ p.text-secondary {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Premium Layout Toggle */
+.layout-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toggle-btn:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.toggle-btn.active {
+  background: var(--primary);
+  color: #000;
+  box-shadow: 0 4px 12px rgba(68, 184, 92, 0.3);
+}
+
+.toggle-btn svg {
+  transition: transform 0.3s ease;
+}
+
+.toggle-btn.active svg {
+  transform: scale(1.1);
+}
+
+/* Sync Spinner for Cloud Operations */
+.sync-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(68, 184, 92, 0.1);
+  border-left-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
   }
 }

@@ -15,8 +15,10 @@ import {
     Square,
     HandCoins,
     CircleDollarSign,
-    CheckCircle2,
-    Circle
+    Clock,
+    LayoutGrid,
+    List,
+    CheckCircle2
 } from 'lucide-react';
 
 const Employees = () => {
@@ -28,6 +30,7 @@ const Employees = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showBulkModal, setShowBulkModal] = useState(false);
     const [selectedForBulk, setSelectedForBulk] = useState([]);
+    const [viewMode, setViewMode] = useState('list'); // 'grid' or 'list'
 
     const [newEmployee, setNewEmployee] = useState({
         name: '',
@@ -134,22 +137,65 @@ const Employees = () => {
 
     return (
         <div className="page dashboard-fade-in">
-            <div className="page-header">
-                <div>
-                    <h2>إدارة شؤون الموظفين</h2>
-                    <p className="text-secondary">إدارة بيانات الفريق، الرواتب والمهام الوظيفية</p>
+            <div className="module-header">
+                <div className="module-info">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
+                        <div className="legendary-icon-container" style={{ background: 'rgba(255,255,255,0.1)', padding: '10px', borderRadius: '12px' }}>
+                            <UsersRound size={24} color="white" />
+                        </div>
+                        <h1 style={{ fontSize: '24px' }}>إدارة شؤون الموظفين</h1>
+                    </div>
+                    <p>إدارة بيانات الفريق، الرواتب والمهام الوظيفية بكفاءة عالية.</p>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginTop: '20px' }}>
+                        <div className="header-search-box" style={{ position: 'relative', flex: 1, maxWidth: '400px' }}>
+                            <Search size={18} style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
+                            <input
+                                type="text"
+                                placeholder="البحث باسم الموظف أو الوظيفة..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="glass"
+                                style={{
+                                    width: '100%',
+                                    padding: '12px 48px 12px 20px',
+                                    borderRadius: '12px',
+                                    border: '1px solid var(--glass-border)',
+                                    background: 'rgba(255,255,255,0.03)',
+                                    color: 'white',
+                                    fontSize: '14px'
+                                }}
+                            />
+                        </div>
+
+                        <div className="layout-toggle">
+                            <button
+                                className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+                                onClick={() => setViewMode('list')}
+                                title="عرض القائمة"
+                            >
+                                <List size={20} />
+                            </button>
+                            <button
+                                className={`toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                                onClick={() => setViewMode('grid')}
+                                title="عرض الشبكة"
+                            >
+                                <LayoutGrid size={20} />
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div className="flex gap-2">
+
+                <div className="module-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                     <button className="btn-secondary" onClick={() => {
                         setSelectedForBulk([]);
                         setShowBulkModal(true);
-                    }}>
-                        <div className="bulk-pay-icon-wrapper">
-                            <CircleDollarSign size={18} />
-                        </div>
+                    }} style={{ height: '40px', padding: '0 16px', borderRadius: '10px' }}>
+                        <CircleDollarSign size={18} />
                         <span>صرف جماعي</span>
                     </button>
-                    <button className="btn-primary" onClick={() => setShowModal(true)}>
+                    <button className="btn-primary" onClick={() => setShowModal(true)} style={{ height: '40px', padding: '0 20px', borderRadius: '10px', boxShadow: '0 8px 16px rgba(68, 184, 92, 0.2)' }}>
                         <Plus size={20} />
                         <span>إضافة موظف جديد</span>
                     </button>
@@ -186,78 +232,98 @@ const Employees = () => {
                 </div>
             </div>
 
-            <div className="table-container" style={{ marginTop: '32px' }}>
-                <div className="table-header-tools">
-                    <div className="search-bar" style={{ margin: 0, border: 'none', background: 'transparent' }}>
-                        <Search size={18} className="text-secondary" />
-                        <input
-                            placeholder="بحث عن موظف..."
-                            value={searchTerm}
-                            onChange={e => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-                </div>
-                <table className="data-table">
-                    <thead>
-                        <tr>
-                            <th>الموظف</th>
-                            <th>الوظيفة</th>
-                            <th>الراتب الأساسي</th>
-                            <th>تاريخ التعاقد</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredEmployees.map(emp => (
-                            <tr key={emp.id}>
-                                <td>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                        <div className="user-avatar" style={{ width: '36px', height: '36px', fontSize: '14px' }}>
-                                            {emp.name.charAt(0)}
+            {viewMode === 'list' ? (
+                <div className="table-container glass" style={{ marginTop: '32px' }}>
+                    <table className="data-table">
+                        <thead>
+                            <tr>
+                                <th>الموظف</th>
+                                <th>الوظيفة</th>
+                                <th>الراتب الأساسي</th>
+                                <th>تاريخ التعاقد</th>
+                                <th className="text-center">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredEmployees.map(emp => (
+                                <tr key={emp.id}>
+                                    <td>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <div className="user-avatar" style={{ width: '36px', height: '36px', fontSize: '14px' }}>
+                                                {emp.name.charAt(0)}
+                                            </div>
+                                            <div style={{ fontWeight: '600' }}>{emp.name}</div>
                                         </div>
-                                        <div style={{ fontWeight: '600' }}>{emp.name}</div>
+                                    </td>
+                                    <td>
+                                        <span className="role-badge">
+                                            <Briefcase size={12} />
+                                            {emp.role}
+                                        </span>
+                                    </td>
+                                    <td style={{ fontWeight: '700', color: 'var(--primary)' }}>{Number(emp.baseSalary).toLocaleString()} ج.م</td>
+                                    <td>
+                                        <div className="date-info">
+                                            <Calendar size={14} className="text-secondary" />
+                                            {new Date(emp.joinDate).toLocaleDateString('ar-EG')}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="table-actions">
+                                            <button className="btn-icon-action" onClick={() => startPay(emp)} title="صرف الراتب">
+                                                <Wallet size={16} />
+                                            </button>
+                                            <button className="btn-icon-action" onClick={() => startEdit(emp)} title="تعديل">
+                                                <Edit size={16} />
+                                            </button>
+                                            <button className="btn-icon-action delete-btn" onClick={() => { if (window.confirm(`هل أنت متأكد من حذف الموظف "${emp.name}"؟`)) deleteEmployee(emp.id); }} title="حذف">
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                            {filteredEmployees.length === 0 && (
+                                <tr>
+                                    <td colSpan="5" className="text-center">لا يوجد موظفين يطابقون البحث.</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            ) : (
+                <div className="grid">
+                    {filteredEmployees.length === 0 ? (
+                        <div className="card glass text-center" style={{ gridColumn: '1 / -1', padding: '60px' }}>
+                            <UsersRound size={48} className="text-secondary" style={{ margin: '0 auto 16px' }} />
+                            <p className="text-secondary">لا يوجد موظفين يطابقون البحث</p>
+                        </div>
+                    ) : (
+                        filteredEmployees.map(emp => (
+                            <div key={emp.id} className="card glass employee-card-enhanced">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px', alignItems: 'center' }}>
+                                    <div className="user-avatar" style={{ width: '40px', height: '40px', fontSize: '16px' }}>
+                                        {emp.name.charAt(0)}
                                     </div>
-                                </td>
-                                <td>
-                                    <span className="role-badge">
-                                        <Briefcase size={12} />
+                                    <span className="role-badge" style={{ fontSize: '11px' }}>
                                         {emp.role}
                                     </span>
-                                </td>
-                                <td style={{ fontWeight: '700', color: 'var(--primary)' }}>{Number(emp.baseSalary).toLocaleString()} ج.م</td>
-                                <td>
-                                    <div className="date-info">
-                                        <Calendar size={14} className="text-secondary" />
-                                        {new Date(emp.joinDate).toLocaleDateString('ar-EG')}
-                                    </div>
-                                </td>
-                                <td>
-                                    <div className="table-actions">
-                                        <button className="btn-action-primary" onClick={() => startPay(emp)} title="صرف الراتب">
-                                            <Wallet size={16} />
-                                            <span>صرف</span>
-                                        </button>
-                                        <button className="btn-icon" onClick={() => startEdit(emp)} title="تعديل">
-                                            <Edit size={16} />
-                                        </button>
-                                        <button
-                                            className="btn-icon text-danger"
-                                            onClick={() => {
-                                                if (window.confirm(`هل أنت متأكد من حذف الموظف "${emp.name}"؟ سيتم مسح كافة سجلاته من النظام.`)) {
-                                                    deleteEmployee(emp.id);
-                                                }
-                                            }}
-                                            title="حذف"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                                </div>
+                                <h4 style={{ marginBottom: '8px' }}>{emp.name}</h4>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                                    <div style={{ fontSize: '12px', color: 'var(--text-dim)' }}>الراتب الأساسي</div>
+                                    <div style={{ fontWeight: '700', color: 'var(--primary)' }}>{Number(emp.baseSalary).toLocaleString()} ج.م</div>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', borderTop: '1px solid var(--glass-border)', paddingTop: '15px' }}>
+                                    <button className="btn-icon-action" onClick={() => startPay(emp)} title="صرف الراتب"><Wallet size={16} /></button>
+                                    <button className="btn-icon-action" onClick={() => startEdit(emp)} title="تعديل"><Edit size={16} /></button>
+                                    <button className="btn-icon-action delete-btn" onClick={() => { if (window.confirm(`حذف الموظف "${emp.name}"؟`)) deleteEmployee(emp.id); }} title="حذف"><Trash2 size={16} /></button>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            )}
 
             {/* Add/Edit Modal */}
             {showModal && (

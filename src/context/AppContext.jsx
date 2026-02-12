@@ -4,41 +4,127 @@ import { supabase } from '../supabase';
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
+    // Finance State - Moved to top to avoid ReferenceErrors
+    const [transactions, setTransactions] = useState(() => {
+        try {
+            const saved = localStorage.getItem('kitchinz_transactions');
+            return saved ? JSON.parse(saved) : [
+                { id: '1', date: new Date().toISOString(), type: 'income', amount: 50000, category: 'دفعة تعاقد', notes: 'تعاقد مشروع الشيخ زايد', account: 'الخزنة الرئيسية' },
+                { id: '2', date: new Date().toISOString(), type: 'expense', amount: 15000, category: 'مشتريات خامات', notes: 'خامات ألمنيوم', account: 'الخزنة الرئيسية' }
+            ];
+        } catch (e) {
+            console.error("Failed to parse transactions from localStorage:", e);
+            return [];
+        }
+    });
+
+    const [accounts, setAccounts] = useState(() => {
+        try {
+            const saved = localStorage.getItem('kitchinz_accounts');
+            return saved ? JSON.parse(saved) : [
+                { id: '1', name: 'الخزنة الرئيسية', balance: 35000 },
+                { id: '2', name: 'البنك العربي', balance: 120000 },
+                { id: '3', name: 'عهدة مدير المشروع', balance: 5000 }
+            ];
+        } catch (e) {
+            console.error("Failed to parse accounts from localStorage:", e);
+            return [];
+        }
+    });
+
+    // HR State - Moved to top
+    const [employees, setEmployees] = useState(() => {
+        try {
+            const saved = localStorage.getItem('kitchinz_employees');
+            return saved ? JSON.parse(saved) : [
+                { id: '1', name: 'أحمد محمود', role: 'فني تركيبات', baseSalary: 8000, joinDate: '2023-05-10' },
+                { id: '2', name: 'منى حسن', role: 'مصممة ديكور', baseSalary: 12000, joinDate: '2024-01-15' }
+            ];
+        } catch (e) {
+            console.error("Failed to parse employees from localStorage:", e);
+            return [];
+        }
+    });
+
+    // Recurring Expenses State - Moved to top
+    const [recurringExpenses, setRecurringExpenses] = useState(() => {
+        try {
+            const saved = localStorage.getItem('kitchinz_recurring');
+            return saved ? JSON.parse(saved) : [
+                { id: '1', label: 'إيجار المعرض', amount: 15000, category: 'مصاريف معرض', account: 'الخزنة الرئيسية' },
+                { id: '2', label: 'فاتورة الكهرباء', amount: 1200, category: 'مصاريف معرض', account: 'الخزنة الرئيسية' }
+            ];
+        } catch (e) {
+            console.error("Failed to parse recurring expenses from localStorage:", e);
+            return [];
+        }
+    });
+
     const [customers, setCustomers] = useState(() => {
-        const saved = localStorage.getItem('kitchinz_customers');
-        return saved ? JSON.parse(saved) : [
-            { id: '1', name: 'أحمد علي', phone: '01012345678', address: 'القاهرة، مصر', email: 'ahmed@example.com', balance: 0 },
-            { id: '2', name: 'سارة حسن', phone: '01122334455', address: 'الجيزة، مصر', email: 'sarah@example.com', balance: 0 }
-        ];
+        try {
+            const saved = localStorage.getItem('kitchinz_customers');
+            return saved ? JSON.parse(saved) : [
+                { id: '1', name: 'أحمد علي', phone: '01012345678', address: 'القاهرة، مصر', email: 'ahmed@example.com', balance: 0 },
+                { id: '2', name: 'سارة حسن', phone: '01122334455', address: 'الجيزة، مصر', email: 'sarah@example.com', balance: 0 }
+            ];
+        } catch (e) {
+            console.error("Failed to parse customers from localStorage:", e);
+            return [];
+        }
     });
 
     const [purchases, setPurchases] = useState(() => {
-        const saved = localStorage.getItem('kitchinz_purchases');
-        return saved ? JSON.parse(saved) : [];
+        try {
+            const saved = localStorage.getItem('kitchinz_purchases');
+            return saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            console.error("Failed to parse purchases from localStorage:", e);
+            return [];
+        }
     });
 
     const [inventory, setInventory] = useState(() => {
-        const saved = localStorage.getItem('kitchinz_inventory');
-        return saved ? JSON.parse(saved) : [
-            { id: '1', name: 'خشب بلوط', unit: 'متر مربع', stock: 50 },
-            { id: '2', name: 'جرانيت كاونترتوب', unit: 'قطعة', stock: 10 },
-            { id: '3', name: 'مفصلات إغلاق هادئ', unit: 'قطعة', stock: 200 }
-        ];
+        try {
+            const saved = localStorage.getItem('kitchinz_inventory');
+            return saved ? JSON.parse(saved) : [
+                { id: '1', name: 'خشب بلوط', unit: 'متر مربع', stock: 50 },
+                { id: '2', name: 'جرانيت كاونترتوب', unit: 'قطعة', stock: 10 },
+                { id: '3', name: 'مفصلات إغلاق هادئ', unit: 'قطعة', stock: 200 }
+            ];
+        } catch (e) {
+            console.error("Failed to parse inventory from localStorage:", e);
+            return [];
+        }
     });
 
     const [contracts, setContracts] = useState(() => {
-        const saved = localStorage.getItem('kitchinz_contracts');
-        return saved ? JSON.parse(saved) : [];
+        try {
+            const saved = localStorage.getItem('kitchinz_contracts');
+            return saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            console.error("Failed to parse contracts from localStorage:", e);
+            return [];
+        }
     });
 
     const [inspections, setInspections] = useState(() => {
-        const saved = localStorage.getItem('kitchinz_inspections');
-        return saved ? JSON.parse(saved) : [];
+        try {
+            const saved = localStorage.getItem('kitchinz_inspections');
+            return saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            console.error("Failed to parse inspections from localStorage:", e);
+            return [];
+        }
     });
 
     const [invoices, setInvoices] = useState(() => {
-        const saved = localStorage.getItem('kitchinz_invoices');
-        return saved ? JSON.parse(saved) : [];
+        try {
+            const saved = localStorage.getItem('kitchinz_invoices');
+            return saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            console.error("Failed to parse invoices from localStorage:", e);
+            return [];
+        }
     });
 
     const defaultPermissions = {
@@ -69,63 +155,117 @@ export const AppProvider = ({ children }) => {
     };
 
     const [users, setUsers] = useState(() => {
-        const saved = localStorage.getItem('kitchinz_users');
-        let data = saved ? JSON.parse(saved) : [];
-        const defaults = [
-            { id: '1', name: 'المسؤول', role: 'admin', username: 'admin', password: '123', status: 'active', permissions: adminPermissions },
-            { id: '2', name: 'مهندس أحمد', role: 'engineer', username: 'ahmed', password: '123', status: 'active', permissions: { ...defaultPermissions, canViewDashboard: true, canManageContracts: true, canManageInventory: true, canManageCustomers: true } },
-            { id: '3', name: 'محمد فتوح', role: 'admin', username: 'mhmd', password: '123', status: 'active', permissions: adminPermissions }
-        ];
+        try {
+            const saved = localStorage.getItem('kitchinz_users');
+            let data = saved ? JSON.parse(saved) : [];
+            const defaults = [
+                { id: '1', name: 'المسؤول', role: 'admin', username: 'admin', password: '123', status: 'active', permissions: adminPermissions },
+                { id: '2', name: 'مهندس أحمد', role: 'engineer', username: 'ahmed', password: '123', status: 'active', permissions: { ...defaultPermissions, canViewDashboard: true, canManageContracts: true, canManageInventory: true, canManageCustomers: true } },
+                { id: '3', name: 'محمد فتوح', role: 'admin', username: 'mhmd', password: '123', status: 'active', permissions: adminPermissions }
+            ];
 
-        // Update old users with default permissions if missing
-        data = data.map(u => {
-            const upToDatePermissions = u.permissions || (u.role === 'admin' ? adminPermissions : defaultPermissions);
-            // Extra safety: if admin, ensure all keys are present
-            if (u.role === 'admin') {
-                return { ...u, permissions: { ...adminPermissions, ...u.permissions } };
-            }
-            return { ...u, permissions: upToDatePermissions };
-        });
+            // Update old users with default permissions if missing
+            data = data.map(u => {
+                const upToDatePermissions = u.permissions || (u.role === 'admin' ? adminPermissions : defaultPermissions);
+                // Extra safety: if admin, ensure all keys are present
+                if (u.role === 'admin') {
+                    return { ...u, permissions: { ...adminPermissions, ...u.permissions } };
+                }
+                return { ...u, permissions: upToDatePermissions };
+            });
 
-        // Ensure defaults are present
-        defaults.forEach(def => {
-            if (!data.find(u => u.username === def.username)) {
-                data.push(def);
-            }
-        });
+            // Ensure defaults are present
+            defaults.forEach(def => {
+                if (!data.find(u => u.username === def.username)) {
+                    data.push(def);
+                }
+            });
 
-        return data;
+            return data;
+        } catch (e) {
+            console.error("Failed to parse users from localStorage:", e);
+            return [
+                { id: '1', name: 'المسؤول', role: 'admin', username: 'admin', password: '123', status: 'active', permissions: adminPermissions },
+                { id: '2', name: 'مهندس أحمد', role: 'engineer', username: 'ahmed', password: '123', status: 'active', permissions: { ...defaultPermissions, canViewDashboard: true, canManageContracts: true, canManageInventory: true, canManageCustomers: true } },
+                { id: '3', name: 'محمد فتوح', role: 'admin', username: 'mhmd', password: '123', status: 'active', permissions: adminPermissions }
+            ];
+        }
     });
 
     const [currentUser, setCurrentUser] = useState(() => {
-        const saved = localStorage.getItem('kitchinz_current_user');
-        return saved ? JSON.parse(saved) : null;
+        try {
+            const saved = localStorage.getItem('kitchinz_current_user');
+            return saved ? JSON.parse(saved) : null;
+        } catch (e) {
+            console.error("Failed to parse currentUser from localStorage:", e);
+            return null;
+        }
     });
 
     const [systemSettings, setSystemSettings] = useState(() => {
-        const saved = localStorage.getItem('kitchinz_settings');
-        return saved ? JSON.parse(saved) : {
-            companyName: 'كيتشينز للعمارة والديكور',
-            currency: 'ج.م',
-            taxRate: 14,
-            address: 'العاشر من رمضان، مصر',
-            phone: '01012345678',
-            inspectionFee: 500
-        };
+        try {
+            const saved = localStorage.getItem('kitchinz_settings');
+            return saved ? JSON.parse(saved) : {
+                companyName: 'كيتشينز للعمارة والديكور',
+                currency: 'ج.م',
+                taxRate: 14,
+                address: 'العاشر من رمضان، مصر',
+                phone: '01012345678',
+                inspectionFee: 500,
+                representativeName: '',
+                representativeNationalId: ''
+            };
+        } catch (e) {
+            console.error("Failed to parse settings from localStorage:", e);
+            return {
+                companyName: 'كيتشينز للعمارة والديكور',
+                currency: 'ج.م',
+                taxRate: 14,
+                address: 'العاشر من رمضان، مصر',
+                phone: '01012345678',
+                inspectionFee: 500,
+                representativeName: '',
+                representativeNationalId: ''
+            };
+        }
     });
 
     const [contractOptions, setContractOptions] = useState(() => {
-        const saved = localStorage.getItem('kitchinz_contract_options');
-        return saved ? JSON.parse(saved) : {
-            projectTypes: ['مطبخ', 'دريسنج', 'وحدات حمام', 'أخرى'],
-            woodTypes: ['HPL', 'UV', 'قشرة طبيعي', 'أكريليك', 'بولي لاك', 'سوبر جلوس'],
-            innerShellTypes: ['أبيض فايبر', 'خشبي فايبر', 'أبيض ميلامين', 'خشبي ميلامين'],
-            hingeTypes: ['إغلاق هادئ (Soft Close)', 'عادي'],
-            slideTypes: ['إغلاق هادئ (Soft Close)', 'عادي'],
-            handleTypes: ['داخلي (G-Line)', 'خارجي متصل', 'خارجي منفصل'],
-            accessoryNames: ['سلة مهملات', 'صفاية أطباق', 'منظم أدراج', 'إضاءة لد']
-        };
+        try {
+            const saved = localStorage.getItem('kitchinz_contract_options');
+            return saved ? JSON.parse(saved) : {
+                projectTypes: ['مطبخ', 'دريسنج', 'وحدات حمام', 'أخرى'],
+                woodTypes: ['HPL', 'UV', 'قشرة طبيعي', 'أكريليك', 'بولي لاك', 'سوبر جلوس'],
+                innerShellTypes: ['أبيض فايبر', 'خشبي فايبر', 'أبيض ميلامين', 'خشبي ميلامين'],
+                hingeTypes: ['إغلاق هادئ (Soft Close)', 'عادي'],
+                slideTypes: ['إغلاق هادئ (Soft Close)', 'عادي'],
+                handleTypes: ['داخلي (G-Line)', 'خارجي متصل', 'خارجي منفصل'],
+                accessoryNames: ['سلة مهملات', 'صفاية أطباق', 'منظم أدراج', 'إضاءة لد'],
+                hangingTypes: ['تعليقة بليتة', 'تعليقة كوابيل'],
+                flipUpTypes: ['هيدروليك باكم', 'أفنتوس بلوم', 'ميكانزم صيني'],
+                legTypes: ['رجول ألمنيوم', 'رجول بلاستيك', 'رجول إستانلس'],
+                toeKickTypes: ['وزر ألمنيوم', 'وزر خشب نفس اللون', 'وزر بلاستيك'],
+                units: ['متر مربع', 'متر طولي', 'قطعة', 'لوح', 'لتر', 'كجم']
+            };
+        } catch (e) {
+            console.error("Failed to parse contract options from localStorage:", e);
+            return {
+                projectTypes: ['مطبخ', 'دريسنج', 'وحدات حمام', 'أخرى'],
+                woodTypes: ['HPL', 'UV', 'قشرة طبيعي', 'أكريليك', 'بولي لاك', 'سوبر جلوس'],
+                innerShellTypes: ['أبيض فايبر', 'خشبي فايبر', 'أبيض ميلامين', 'خشبي ميلامين'],
+                hingeTypes: ['إغلاق هادئ (Soft Close)', 'عادي'],
+                slideTypes: ['إغلاق هادئ (Soft Close)', 'عادي'],
+                handleTypes: ['داخلي (G-Line)', 'خارجي متصل', 'خارجي منفصل'],
+                accessoryNames: ['سلة مهملات', 'صفاية أطباق', 'منظم أدراج', 'إضاءة لد'],
+                hangingTypes: ['تعليقة بليتة', 'تعليقة كوابيل'],
+                flipUpTypes: ['هيدروليك باكم', 'أفنتوس بلوم', 'ميكانزم صيني'],
+                legTypes: ['رجول ألمنيوم', 'رجول بلاستيك', 'رجول إستانلس'],
+                toeKickTypes: ['وزر ألمنيوم', 'وزر خشب نفس اللون', 'وزر بلاستيك'],
+                units: ['متر مربع', 'متر طولي', 'قطعة', 'لوح', 'لتر', 'كجم']
+            };
+        }
     });
+
 
     const [isCloudLoading, setIsCloudLoading] = useState(true);
 
@@ -159,22 +299,28 @@ export const AppProvider = ({ children }) => {
             // 1. Initial Migration Check (LocalStorage to Supabase)
             try {
                 for (const tableSpec of tablesToSync) {
+                    console.log(`🔍 Checking sync for ${tableSpec.name}...`);
                     const { data: existingData, error } = await supabase.from(tableSpec.name).select('*');
 
-                    if (error) throw error;
+                    if (error) {
+                        console.error(`❌ Error fetching ${tableSpec.name}:`, error);
+                        continue; // Skip this table and try next
+                    }
 
                     if ((!existingData || existingData.length === 0) && tableSpec.state.length > 0) {
-                        console.log(`Migrating ${tableSpec.name} to Supabase...`);
-                        const dataToInsert = tableSpec.isSingle ? [tableSpec.state] : tableSpec.state;
-                        // Supabase doesn't like duplicate IDs if they already exist, but we checked empty
-                        await supabase.from(tableSpec.name).insert(dataToInsert);
+                        console.log(`📤 Migrating local ${tableSpec.name} to Supabase...`);
+                        const dataToInsert = tableSpec.isSingle ? [tableSpec.state] : tableSpec.state.slice(0, 50); // Batch limit
+                        const { error: insertError } = await supabase.from(tableSpec.name).insert(dataToInsert);
+                        if (insertError) console.error(`❌ Migration failed for ${tableSpec.name}:`, insertError);
+                        else console.log(`✅ Migration successful for ${tableSpec.name}`);
                     } else if (existingData && existingData.length > 0) {
+                        console.log(`📥 Loading ${existingData.length} records for ${tableSpec.name} from cloud`);
                         if (tableSpec.isSingle) tableSpec.setter(existingData[0]);
                         else tableSpec.setter(existingData);
                     }
                 }
             } catch (err) {
-                console.warn("Supabase connection issues or migration failed. Using local storage Fallback.", err);
+                console.warn("⚠️ Supabase sync interrupted. System will continue with local data.", err);
             } finally {
                 setIsCloudLoading(false);
             }
@@ -252,24 +398,6 @@ export const AppProvider = ({ children }) => {
             localStorage.removeItem('kitchinz_current_user');
         }
     }, [currentUser, users]);
-
-    // Finance State
-    const [transactions, setTransactions] = useState(() => {
-        const saved = localStorage.getItem('kitchinz_transactions');
-        return saved ? JSON.parse(saved) : [
-            { id: '1', date: new Date().toISOString(), type: 'income', amount: 50000, category: 'دفعة تعاقد', notes: 'تعاقد مشروع الشيخ زايد', account: 'الخزنة الرئيسية' },
-            { id: '2', date: new Date().toISOString(), type: 'expense', amount: 15000, category: 'مشتريات خامات', notes: 'خامات ألمنيوم', account: 'الخزنة الرئيسية' }
-        ];
-    });
-
-    const [accounts, setAccounts] = useState(() => {
-        const saved = localStorage.getItem('kitchinz_accounts');
-        return saved ? JSON.parse(saved) : [
-            { id: '1', name: 'الخزنة الرئيسية', balance: 35000 },
-            { id: '2', name: 'البنك العربي', balance: 120000 },
-            { id: '3', name: 'عهدة مدير المشروع', balance: 5000 }
-        ];
-    });
 
     useEffect(() => {
         localStorage.setItem('kitchinz_transactions', JSON.stringify(transactions));
@@ -456,15 +584,6 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    // HR State
-    const [employees, setEmployees] = useState(() => {
-        const saved = localStorage.getItem('kitchinz_employees');
-        return saved ? JSON.parse(saved) : [
-            { id: '1', name: 'أحمد محمود', role: 'فني تركيبات', baseSalary: 8000, joinDate: '2023-05-10' },
-            { id: '2', name: 'منى حسن', role: 'مصممة ديكور', baseSalary: 12000, joinDate: '2024-01-15' }
-        ];
-    });
-
     useEffect(() => {
         localStorage.setItem('kitchinz_employees', JSON.stringify(employees));
     }, [employees]);
@@ -505,15 +624,6 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    // Recurring Expenses State
-    const [recurringExpenses, setRecurringExpenses] = useState(() => {
-        const saved = localStorage.getItem('kitchinz_recurring');
-        return saved ? JSON.parse(saved) : [
-            { id: '1', label: 'إيجار المعرض', amount: 15000, category: 'مصاريف معرض', account: 'الخزنة الرئيسية' },
-            { id: '2', label: 'فاتورة الكهرباء', amount: 1200, category: 'مصاريف معرض', account: 'الخزنة الرئيسية' }
-        ];
-    });
-
     useEffect(() => {
         localStorage.setItem('kitchinz_recurring', JSON.stringify(recurringExpenses));
     }, [recurringExpenses]);
@@ -549,11 +659,28 @@ export const AppProvider = ({ children }) => {
 
     const addCustomer = async (customer) => {
         const id = Date.now().toString();
-        const newCustomer = { ...customer, id, balance: Number(customer.balance) || 0 };
-        setCustomers([...customers, newCustomer]);
+        const newCustomer = {
+            id,
+            name: customer.name || '',
+            phone: customer.phone || '',
+            address: customer.address || '',
+            email: customer.email || '',
+            balance: Number(customer.balance) || 0,
+            projectType: customer.projectType || 'kitchen'
+        };
+
+        setCustomers(prev => [...prev, newCustomer]);
+
         try {
-            if (supabase) await supabase.from('customers').insert(newCustomer);
-        } catch (e) { console.error(e); }
+            if (supabase) {
+                const { error } = await supabase.from('customers').insert(newCustomer);
+                if (error) {
+                    console.error("❌ Supabase Save Error:", error);
+                } else {
+                    console.log("✅ Customer saved to cloud");
+                }
+            }
+        } catch (e) { console.error("❌ Sync Logic Error:", e); }
     };
 
     const updateCustomer = async (updatedCustomer) => {
@@ -777,11 +904,34 @@ export const AppProvider = ({ children }) => {
 
     const addContract = async (contract) => {
         const id = Date.now().toString();
+
+        // Generate Daily Serial Number (K[Index]-[DDMMYYYY])
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const year = today.getFullYear();
+        const dateSuffix = `${day}${month}${year}`;
+
+        // Find existing contracts from today to determine next index
+        const todayContracts = contracts.filter(c => c.serialNumber && c.serialNumber.endsWith(dateSuffix));
+        let nextIndex = 1;
+
+        if (todayContracts.length > 0) {
+            const indices = todayContracts.map(c => {
+                const match = c.serialNumber.match(/^K(\d+)-/);
+                return match ? parseInt(match[1]) : 0;
+            });
+            nextIndex = Math.max(...indices) + 1;
+        }
+
+        const serialNumber = `K${String(nextIndex).padStart(3, '0')}-${dateSuffix}`;
+
         const newContract = {
             ...contract,
             id,
+            serialNumber,
             status: 'new',
-            savedAt: new Date().toISOString()
+            savedAt: today.toISOString()
         };
         setContracts([newContract, ...contracts]);
         try {

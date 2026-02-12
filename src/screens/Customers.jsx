@@ -6,15 +6,22 @@ import {
     Plus,
     Search,
     User,
+    Eye,
     History,
     FileText,
     ShoppingCart,
     Calendar,
     DollarSign,
     Package,
-    Edit2,
+    PencilLine,
     Trash2,
-    FileSpreadsheet
+    UserMinus,
+    FileSpreadsheet,
+    Users,
+    LayoutGrid,
+    List,
+    Info,
+    CreditCard
 } from 'lucide-react';
 import { exportToExcel, formatters } from '../utils/excelExport';
 
@@ -50,6 +57,7 @@ const Customers = () => {
         projectType: 'kitchen' // Default to kitchen
     });
     const [searchTerm, setSearchTerm] = useState('');
+    const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
     const [isEditing, setIsEditing] = useState(false);
     const [activeTab, setActiveTab] = useState('info'); // info, contracts, purchases, finances, inspections
     const [showInspectionModal, setShowInspectionModal] = useState(false);
@@ -192,58 +200,116 @@ const Customers = () => {
                 </div>
             </div>
 
-            <div className="search-bar glass">
-                <Search size={20} />
-                <input
-                    type="text"
-                    placeholder="البحث بالاسم أو رقم الهاتف..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    dir="rtl"
-                />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
+                <div className="header-search-box glass" style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.03)', padding: '0 15px' }}>
+                    <Search size={20} style={{ color: 'var(--text-dim)' }} />
+                    <input
+                        type="text"
+                        placeholder="البحث باسم العميل أو رقم الهاتف..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        style={{ background: 'transparent', border: 'none', color: 'white', width: '100%', padding: '12px 10px', outline: 'none' }}
+                    />
+                </div>
+
+                <div className="layout-toggle">
+                    <button
+                        className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+                        onClick={() => setViewMode('list')}
+                        title="عرض القائمة"
+                    >
+                        <List size={20} />
+                    </button>
+                    <button
+                        className={`toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                        onClick={() => setViewMode('grid')}
+                        title="عرض الشبكة"
+                    >
+                        <LayoutGrid size={20} />
+                    </button>
+                </div>
             </div>
 
-            <div className="grid">
-                {filteredCustomers.map(customer => (
-                    <div key={customer.id} className="card glass">
-                        <div className="card-header">
-                            <div className="customer-avatar">
-                                <User size={24} />
-                            </div>
-                            <div>
-                                <h3>{customer.name}</h3>
-                                <p>{customer.phone}</p>
-                            </div>
-                        </div>
-                        <div className="card-body">
-                            <p><strong>البريد الإلكتروني:</strong> {customer.email}</p>
-                            <p><strong>العنوان:</strong> {customer.address}</p>
-                            <div style={{ marginTop: '12px', padding: '10px', background: 'rgba(70, 174, 76, 0.05)', borderRadius: '8px', border: '1px solid rgba(70, 174, 76, 0.1)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>رصيد المشروع:</span>
-                                    <span style={{ fontWeight: '700', color: '#46ae4c', fontSize: '16px' }}>
-                                        {(customer.balance || 0).toLocaleString()} <small>ج.م</small>
-                                    </span>
+            {viewMode === 'grid' ? (
+                <div className="grid">
+                    {filteredCustomers.map(customer => (
+                        <div key={customer.id} className="card glass">
+                            <div className="card-header">
+                                <div className="customer-avatar">
+                                    <User size={24} />
+                                </div>
+                                <div>
+                                    <h3>{customer.name}</h3>
+                                    <p>{customer.phone}</p>
                                 </div>
                             </div>
+                            <div className="card-body">
+                                <p><strong>البريد الإلكتروني:</strong> {customer.email}</p>
+                                <p><strong>العنوان:</strong> {customer.address}</p>
+                                <div style={{ marginTop: '12px', padding: '10px', background: 'rgba(70, 174, 76, 0.05)', borderRadius: '8px', border: '1px solid rgba(70, 174, 76, 0.1)' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>رصيد المشروع:</span>
+                                        <span style={{ fontWeight: '700', color: '#46ae4c', fontSize: '16px' }}>
+                                            {(customer.balance || 0).toLocaleString()} <small>ج.م</small>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="card-footer customer-actions-modern">
+                                <button className="btn-icon-action view-btn" onClick={() => openCustomerDetails(customer)}>
+                                    <Eye size={18} className="icon-details" />
+                                    <span>التفاصيل</span>
+                                </button>
+                                <button className="btn-icon-action" onClick={(e) => handleEditClick(e, customer)}>
+                                    <PencilLine size={18} className="icon-edit" />
+                                    <span>تعديل</span>
+                                </button>
+                                <button className="btn-icon-action delete-btn" onClick={(e) => handleDeleteClick(e, customer)}>
+                                    <UserMinus size={18} className="icon-delete" />
+                                    <span>حذف</span>
+                                </button>
+                            </div>
                         </div>
-                        <div className="card-footer customer-actions-modern">
-                            <button className="btn-action-view" onClick={() => openCustomerDetails(customer)}>
-                                <History size={16} />
-                                <span>عرض التفاصيل</span>
-                            </button>
-                            <button className="btn-action-edit" onClick={(e) => handleEditClick(e, customer)}>
-                                <Edit2 size={16} />
-                                <span>تعديل</span>
-                            </button>
-                            <button className="btn-action-delete" onClick={(e) => handleDeleteClick(e, customer)}>
-                                <Trash2 size={16} />
-                                <span>حذف</span>
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="card glass" style={{ padding: 0, overflow: 'hidden' }}>
+                    <table className="modern-table" style={{ width: '100%', color: 'white' }}>
+                        <thead>
+                            <tr>
+                                <th>الاسم</th>
+                                <th>الهاتف</th>
+                                <th className="text-center">الرصيد</th>
+                                <th className="text-center">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredCustomers.map(customer => (
+                                <tr key={customer.id}>
+                                    <td>{customer.name}</td>
+                                    <td>{customer.phone}</td>
+                                    <td className="text-center" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>
+                                        {(customer.balance || 0).toLocaleString()} <small>ج.م</small>
+                                    </td>
+                                    <td>
+                                        <div className="table-actions">
+                                            <button className="btn-icon-action view-btn" onClick={() => openCustomerDetails(customer)} title="عرض">
+                                                <Eye size={16} className="icon-details" />
+                                            </button>
+                                            <button className="btn-icon-action" onClick={(e) => handleEditClick(e, customer)} title="تعديل">
+                                                <PencilLine size={16} className="icon-edit" />
+                                            </button>
+                                            <button className="btn-icon-action delete-btn" onClick={(e) => handleDeleteClick(e, customer)} title="حذف">
+                                                <UserMinus size={16} className="icon-delete" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
             {showModal && (
                 <div className="modal-overlay">
@@ -310,17 +376,27 @@ const Customers = () => {
                                 </div>
                             </div>
                             <div className="header-actions">
-                                <button className="btn-icon-bg" onClick={() => { setIsEditing(true); setShowModal(true); setShowHistoryModal(false); }} title="تعديل البيانات"><Edit2 size={18} /></button>
+                                <button className="btn-icon-bg" onClick={() => { setIsEditing(true); setShowModal(true); setShowHistoryModal(false); }} title="تعديل البيانات"><PencilLine size={18} /></button>
                                 <button className="btn-icon" onClick={() => setShowHistoryModal(false)}>&times;</button>
                             </div>
                         </div>
 
                         <div className="customer-tabs">
-                            <button className={`tab-btn ${activeTab === 'info' ? 'active' : ''}`} onClick={() => setActiveTab('info')}>البيانات الأساسية</button>
-                            <button className={`tab-btn ${activeTab === 'inspections' ? 'active' : ''}`} onClick={() => setActiveTab('inspections')}>المعاينات ({customerInspections.length})</button>
-                            <button className={`tab-btn ${activeTab === 'contracts' ? 'active' : ''}`} onClick={() => setActiveTab('contracts')}>العقود ({customerContracts.length})</button>
-                            <button className={`tab-btn ${activeTab === 'purchases' ? 'active' : ''}`} onClick={() => setActiveTab('purchases')}>المشتريات ({customerPurchases.length})</button>
-                            <button className={`tab-btn ${activeTab === 'finances' ? 'active' : ''}`} onClick={() => setActiveTab('finances')}>الحسابات ({customerTransactions.length})</button>
+                            <button className={`tab-btn ${activeTab === 'info' ? 'active' : ''}`} onClick={() => setActiveTab('info')}>
+                                <Info size={16} /> البيانات الأساسية
+                            </button>
+                            <button className={`tab-btn ${activeTab === 'inspections' ? 'active' : ''}`} onClick={() => setActiveTab('inspections')}>
+                                <Search size={16} /> المعاينات ({customerInspections.length})
+                            </button>
+                            <button className={`tab-btn ${activeTab === 'contracts' ? 'active' : ''}`} onClick={() => setActiveTab('contracts')}>
+                                <FileText size={16} /> العقود ({customerContracts.length})
+                            </button>
+                            <button className={`tab-btn ${activeTab === 'purchases' ? 'active' : ''}`} onClick={() => setActiveTab('purchases')}>
+                                <ShoppingCart size={16} /> المشتريات ({customerPurchases.length})
+                            </button>
+                            <button className={`tab-btn ${activeTab === 'finances' ? 'active' : ''}`} onClick={() => setActiveTab('finances')}>
+                                <CreditCard size={16} /> الحسابات ({customerTransactions.length})
+                            </button>
                         </div>
 
                         <div className="tab-content-scroller">
@@ -769,47 +845,79 @@ const Customers = () => {
                     color: var(--text-secondary);
                 }
 
+                :root {
+                    --primary-rgb: 70, 174, 76;
+                }
                 .customer-actions-modern {
                     display: grid;
-                    grid-template-columns: 1.2fr 1fr 1fr;
-                    gap: 8px;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 10px;
                     padding: 15px;
                     border-top: 1px solid rgba(255,255,255,0.05);
                 }
                 .customer-actions-modern button {
                     display: flex;
+                    flex-direction: column;
                     align-items: center;
                     justify-content: center;
                     gap: 6px;
-                    padding: 8px;
-                    border-radius: 8px;
-                    font-size: 13px;
-                    font-weight: 600;
+                    padding: 12px 5px;
+                    border-radius: 14px;
+                    font-size: 11px;
+                    font-weight: 700;
                     cursor: pointer;
                     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                    border: 1px solid rgba(255,255,255,0.05);
+                    border: 1px solid rgba(255,255,255,0.08);
                     background: rgba(255,255,255,0.03);
                     color: white;
+                    width: 100% !important;
+                    height: auto !important;
+                    min-height: 70px;
+                }
+                .customer-actions-modern button span {
+                    display: block;
+                    width: 100%;
+                    text-align: center;
                 }
                 .customer-actions-modern button:hover {
                     transform: translateY(-2px);
                     background: rgba(255,255,255,0.08);
                     border-color: rgba(255,255,255,0.2);
                 }
-                .customer-actions-modern .btn-action-view:hover {
+                .customer-actions-modern .view-btn:hover {
                     color: var(--primary);
-                    border-color: rgba(var(--primary-rgb), 0.3);
-                    background: rgba(var(--primary-rgb), 0.1);
+                    border-color: rgba(70, 174, 92, 0.3);
+                    background: rgba(70, 174, 92, 0.1);
                 }
-                .customer-actions-modern .btn-action-edit:hover {
+                /* Edit button */
+                .customer-actions-modern button:nth-child(2):hover {
                     color: #ffaa00;
                     border-color: rgba(255, 170, 0, 0.3);
                     background: rgba(255, 170, 0, 0.1);
                 }
-                .customer-actions-modern .btn-action-delete:hover {
+                .customer-actions-modern .delete-btn:hover {
                     color: #ff4d4d;
                     border-color: rgba(255, 77, 77, 0.3);
                     background: rgba(255, 77, 77, 0.1);
+                }
+                .icon-details { color: var(--primary); opacity: 0.9; }
+                .icon-edit { color: #ffaa00; opacity: 0.9; }
+                .icon-delete { color: #ff4d4d; opacity: 0.9; }
+                
+                .customer-tabs {
+                    display: flex;
+                    gap: 12px;
+                    padding: 0 5px;
+                    margin-bottom: 20px;
+                    border-bottom: 1px solid rgba(255,255,255,0.05);
+                    overflow-x: auto;
+                }
+                .tab-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    white-space: nowrap;
+                    padding-bottom: 12px;
                 }
                 .customer-actions-modern span {
                     white-space: nowrap;

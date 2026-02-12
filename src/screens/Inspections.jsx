@@ -13,7 +13,9 @@ import {
     CheckCircle2,
     Clock,
     AlertCircle,
-    ChevronDown
+    ChevronDown,
+    LayoutGrid,
+    List
 } from 'lucide-react';
 import InspectionForm from '../components/InspectionForm';
 
@@ -25,6 +27,7 @@ const Inspections = () => {
     const [typeFilter, setTypeFilter] = useState('all');
     const [showAddModal, setShowAddModal] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [viewMode, setViewMode] = useState('list'); // 'grid' or 'list'
 
     const filteredInspections = inspections.filter(ins => {
         const matchesSearch = ins.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -76,28 +79,63 @@ const Inspections = () => {
 
     return (
         <div className="page arabic-text">
-            <div className="page-header">
-                <div>
-                    <h2>إدارة المعاينات الفنية</h2>
-                    <p className="text-secondary">متابعة مواعيد وجداول المعاينات الفنية للمشاريع</p>
+            <div className="module-header">
+                <div className="module-info">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
+                        <div className="legendary-icon-container" style={{ background: 'rgba(255,255,255,0.1)', padding: '10px', borderRadius: '12px' }}>
+                            <Calendar size={24} color="white" />
+                        </div>
+                        <h1 style={{ fontSize: '24px' }}>إدارة المعاينات الفنية</h1>
+                    </div>
+                    <p>متابعة مواعيد وجداول المعاينات الفنية للمشاريع بدقة.</p>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginTop: '20px' }}>
+                        <div className="header-search-box" style={{ position: 'relative', flex: 1, maxWidth: '400px' }}>
+                            <Search size={18} style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
+                            <input
+                                type="text"
+                                placeholder="البحث باسم العميل أو المهندس..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="glass"
+                                style={{
+                                    width: '100%',
+                                    padding: '12px 48px 12px 20px',
+                                    borderRadius: '12px',
+                                    border: '1px solid var(--glass-border)',
+                                    background: 'rgba(255,255,255,0.03)',
+                                    color: 'white',
+                                    fontSize: '14px'
+                                }}
+                            />
+                        </div>
+
+                        <div className="layout-toggle">
+                            <button
+                                className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+                                onClick={() => setViewMode('list')}
+                                title="عرض القائمة"
+                            >
+                                <List size={20} />
+                            </button>
+                            <button
+                                className={`toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                                onClick={() => setViewMode('grid')}
+                                title="عرض الشبكة"
+                            >
+                                <LayoutGrid size={20} />
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <button className="btn-primary" onClick={() => setShowAddModal(true)}>
+
+                <button className="btn-primary" onClick={() => setShowAddModal(true)} style={{ height: '40px', padding: '0 20px', borderRadius: '10px', boxShadow: '0 8px 16px rgba(68, 184, 92, 0.2)' }}>
                     <Plus size={18} />
                     إضافة معاينة جديدة
                 </button>
             </div>
 
-            <div className="filters-bar glass">
-                <div className="search-box">
-                    <Search size={18} />
-                    <input
-                        type="text"
-                        placeholder="البحث باسم العميل أو المهندس..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-
+            <div className="filters-bar glass" style={{ marginBottom: '25px', padding: '15px', borderRadius: '12px' }}>
                 <div className="smart-filters">
                     <div className="filter-group">
                         <span className="filter-label">الحالة:</span>
@@ -140,74 +178,111 @@ const Inspections = () => {
                 </div>
             </div>
 
-            <div className="table-container glass">
-                <table className="data-table" dir="rtl">
-                    <thead>
-                        <tr>
-                            <th>التاريخ المخطط</th>
-                            <th>العميل</th>
-                            <th>النوع</th>
-                            <th>المهندس</th>
-                            <th>الحالة</th>
-                            <th>إجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredInspections.map(ins => {
+            {viewMode === 'list' ? (
+                <div className="table-container glass">
+                    <table className="data-table" dir="rtl">
+                        <thead>
+                            <tr>
+                                <th>التاريخ المخطط</th>
+                                <th>العميل</th>
+                                <th>النوع</th>
+                                <th>المهندس</th>
+                                <th className="text-center">الحالة</th>
+                                <th className="text-center">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredInspections.map(ins => {
+                                const status = getStatusBadge(ins.status);
+                                return (
+                                    <tr key={ins.id}>
+                                        <td>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <Calendar size={14} className="text-primary" />
+                                                {new Date(ins.scheduledDate || ins.date).toLocaleDateString('ar-EG')}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <User size={14} className="text-primary" />
+                                                {ins.customerName}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span className="type-badge">
+                                                {ins.type === 'kitchen' ? 'مطبخ' : 'درسينج'}
+                                            </span>
+                                        </td>
+                                        <td>{ins.representative || '---'}</td>
+                                        <td className="text-center">
+                                            <div className="status-badge-chip" style={{
+                                                backgroundColor: status.bg,
+                                                color: status.color
+                                            }}>
+                                                {status.icon}
+                                                {status.label}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div className="table-actions">
+                                                <button className="btn-icon small" title="عرض التفاصيل" onClick={() => navigate(`/inspection/${ins.id}`)}>
+                                                    <Eye size={16} />
+                                                </button>
+                                                <button className="btn-icon small" title="إصدار فاتورة" onClick={() => handleGenerateInvoice(ins)}>
+                                                    <Receipt size={16} />
+                                                </button>
+                                                <button className="btn-icon small text-danger" title="حذف" onClick={() => { if (window.confirm('حذف المعاينة؟')) deleteInspection(ins.id); }}>
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                            {filteredInspections.length === 0 && (
+                                <tr>
+                                    <td colSpan="6" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>لا توجد معاينات تطابق البحث</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            ) : (
+                <div className="grid">
+                    {filteredInspections.length === 0 ? (
+                        <div className="card glass text-center" style={{ gridColumn: '1 / -1', padding: '60px' }}>
+                            <Calendar size={48} className="text-secondary" style={{ margin: '0 auto 16px' }} />
+                            <p className="text-secondary">لا توجد معاينات تطابق البحث</p>
+                        </div>
+                    ) : (
+                        filteredInspections.map(ins => {
                             const status = getStatusBadge(ins.status);
                             return (
-                                <tr key={ins.id}>
-                                    <td>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <Calendar size={14} className="text-primary" />
+                                <div key={ins.id} className="card glass inspection-card-enhanced">
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--text-dim)' }}>
+                                            <Calendar size={14} />
                                             {new Date(ins.scheduledDate || ins.date).toLocaleDateString('ar-EG')}
                                         </div>
-                                    </td>
-                                    <td>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <User size={14} className="text-primary" />
-                                            {ins.customerName}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="type-badge">
-                                            {ins.type === 'kitchen' ? 'مطبخ' : 'درسينج'}
-                                        </span>
-                                    </td>
-                                    <td>{ins.representative || '---'}</td>
-                                    <td>
-                                        <div className="status-badge-chip" style={{
-                                            backgroundColor: status.bg,
-                                            color: status.color
-                                        }}>
-                                            {status.icon}
+                                        <div className="status-badge-chip small" style={{ backgroundColor: status.bg, color: status.color, padding: '2px 8px', fontSize: '10px' }}>
                                             {status.label}
                                         </div>
-                                    </td>
-                                    <td>
-                                        <div className="actions-cell">
-                                            <button className="btn-icon small" title="عرض التفاصيل" onClick={() => navigate(`/inspection/${ins.id}`)}>
-                                                <Eye size={16} />
-                                            </button>
-                                            <button className="btn-icon small" title="إصدار فاتورة" onClick={() => handleGenerateInvoice(ins)}>
-                                                <Receipt size={16} />
-                                            </button>
-                                            <button className="btn-icon small text-danger" title="حذف" onClick={() => { if (window.confirm('حذف المعاينة؟')) deleteInspection(ins.id); }}>
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                    </div>
+                                    <h4 style={{ marginBottom: '5px' }}>{ins.customerName}</h4>
+                                    <div style={{ fontSize: '12px', color: 'var(--text-dim)', marginBottom: '15px' }}>
+                                        {ins.representative || 'بدون مهندس'} • {ins.type === 'kitchen' ? 'مطبخ' : 'درسينج'}
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', borderTop: '1px solid var(--glass-border)', paddingTop: '15px' }}>
+                                        <button className="btn-icon-action" onClick={() => navigate(`/inspection/${ins.id}`)} title="عرض"><Eye size={16} /></button>
+                                        <button className="btn-icon-action" onClick={() => handleGenerateInvoice(ins)} title="فاتورة"><Receipt size={16} /></button>
+                                        <button className="btn-icon-action delete-btn" onClick={() => { if (window.confirm('حذف المعاينة؟')) deleteInspection(ins.id); }} title="حذف"><Trash2 size={16} /></button>
+                                    </div>
+                                </div>
                             );
-                        })}
-                        {filteredInspections.length === 0 && (
-                            <tr>
-                                <td colSpan="6" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>لا توجد معاينات مسجلة حالياً</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                        })
+                    )}
+                </div>
+            )}
 
             {showAddModal && (
                 <div className="modal-overlay">

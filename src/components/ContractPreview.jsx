@@ -21,7 +21,14 @@ const ContractHeader = ({ data, dayName, formattedDate }) => (
                 <span style={{ fontWeight: '400' }}> ) الموافق </span>
                 <span className="p-text" style={{ fontWeight: '900' }} contentEditable={true} suppressContentEditableWarning={true}>{formattedDate}</span>
             </div>
-            <div style={{ fontWeight: '900', marginBottom: '15px', fontSize: '18px', width: 'fit-content' }}>تم الاتفاق بين كلاً من :</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <div style={{ fontWeight: '900', fontSize: '18px' }}>تم الاتفاق بين كلاً من :</div>
+                {data.serialNumber && (
+                    <div style={{ background: '#f1f5f9', padding: '4px 12px', borderRadius: '4px', fontSize: '14px', fontWeight: 'bold', border: '1px solid #e2e8f0' }}>
+                        رقم العقد: {data.serialNumber}
+                    </div>
+                )}
+            </div>
 
             <div className="intro-row" style={{ paddingRight: '15px', marginBottom: '12px' }}>
                 <span style={{ fontWeight: '400' }}>السادة معرض </span>
