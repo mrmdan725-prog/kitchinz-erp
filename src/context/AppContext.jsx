@@ -300,31 +300,35 @@ export const AppProvider = ({ children }) => {
             try {
                 for (const tableSpec of tablesToSync) {
                     try {
-                        console.log(`🔍 Checking sync for ${tableSpec.name}...`);
                         const { data: existingData, error } = await supabase.from(tableSpec.name).select('*');
 
                         if (error) {
-                            console.error(`❌ Error fetching ${tableSpec.name}:`, error);
+                            console.error(`❌ Sync error for ${tableSpec.name}:`, error.message);
                             continue;
                         }
 
                         if ((!existingData || existingData.length === 0) && tableSpec.state.length > 0) {
-                            console.log(`📤 Migrating local ${tableSpec.name} to Supabase...`);
-                            const dataToInsert = tableSpec.isSingle ? [tableSpec.state] : tableSpec.state.slice(0, 50);
+                            console.log(`📤 Migrating ${tableSpec.name}...`);
+                            // Map local fields to lowercase columns to avoid PG case issues
+                            const dataToInsert = (tableSpec.isSingle ? [tableSpec.state] : tableSpec.state).map(item => {
+                                const normalized = {};
+                                Object.keys(item).forEach(key => {
+                                    normalized[key.toLowerCase()] = item[key];
+                                });
+                                return normalized;
+                            }).slice(0, 50);
+
                             const { error: insertError } = await supabase.from(tableSpec.name).insert(dataToInsert);
-                            if (insertError) console.error(`❌ Migration failed for ${tableSpec.name}:`, insertError);
-                            else console.log(`✅ Migration successful for ${tableSpec.name}`);
+                            if (insertError) console.error(`❌ Migration failed for ${tableSpec.name}:`, insertError.message);
+                            else console.log(`✅ ${tableSpec.name} migrated`);
                         } else if (existingData && existingData.length > 0) {
-                            console.log(`📥 Loading ${existingData.length} records for ${tableSpec.name} from cloud`);
                             if (tableSpec.isSingle) tableSpec.setter(existingData[0]);
                             else tableSpec.setter(existingData);
                         }
-                    } catch (tableErr) {
-                        console.error(`❌ Unexpected error syncing table ${tableSpec.name}:`, tableErr);
-                    }
+                    } catch (err) { console.error(err); }
                 }
             } catch (err) {
-                console.warn("⚠️ Supabase sync loop interrupted.", err);
+                console.warn("⚠️ Sync loop interrupted.", err);
             } finally {
                 setIsCloudLoading(false);
             }
@@ -333,9 +337,6 @@ export const AppProvider = ({ children }) => {
             activeChannels = tablesToSync.map(tableSpec => {
                 return supabase.channel(`public:${tableSpec.name}`)
                     .on('postgres_changes', { event: '*', schema: 'public', table: tableSpec.name }, (payload) => {
-                        console.log(`Change received for ${tableSpec.name}:`, payload);
-
-                        // Refetch all for simplicity or handle individual events
                         supabase.from(tableSpec.name).select('*').then(({ data }) => {
                             if (data) {
                                 if (tableSpec.isSingle) tableSpec.setter(data[0]);
@@ -677,14 +678,21 @@ export const AppProvider = ({ children }) => {
 
         try {
             if (supabase) {
-                const { error } = await supabase.from('customers').insert(newCustomer);
-                if (error) {
-                    console.error("❌ Supabase Save Error:", error);
-                } else {
-                    console.log("✅ Customer saved to cloud");
-                }
+                // Map to lowercase column names for Supabase
+                const dbInfo = {
+                    id: newCustomer.id,
+                    name: newCustomer.name,
+                    phone: newCustomer.phone,
+                    address: newCustomer.address,
+                    email: newCustomer.email,
+                    balance: newCustomer.balance,
+                    projecttype: newCustomer.projectType
+                };
+                const { error } = await supabase.from('customers').insert(dbInfo);
+                if (error) console.error("❌ Supabase Save Error:", error.message);
+                else console.log("✅ Customer saved to cloud");
             }
-        } catch (e) { console.error("❌ Sync Logic Error:", e); }
+        } catch (e) { console.error("❌ Sync Error:", e); }
     };
 
     const updateCustomer = async (updatedCustomer) => {
