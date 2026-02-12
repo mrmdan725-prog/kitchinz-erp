@@ -161,7 +161,8 @@ export const AppProvider = ({ children }) => {
             const defaults = [
                 { id: '1', name: 'المسؤول', role: 'admin', username: 'admin', password: '123', status: 'active', permissions: adminPermissions },
                 { id: '2', name: 'مهندس أحمد', role: 'engineer', username: 'ahmed', password: '123', status: 'active', permissions: { ...defaultPermissions, canViewDashboard: true, canManageContracts: true, canManageInventory: true, canManageCustomers: true } },
-                { id: '3', name: 'محمد فتوح', role: 'admin', username: 'mhmd', password: '123', status: 'active', permissions: adminPermissions }
+                { id: '3', name: 'محمد فتوح', role: 'admin', username: 'mhmd', password: '123', status: 'active', permissions: adminPermissions },
+                { id: '4', name: 'Mohamed Ahmed Shawkey', role: 'admin', username: 'absaif', password: '123', status: 'active', permissions: adminPermissions }
             ];
 
             // Update old users with default permissions if missing
@@ -187,7 +188,8 @@ export const AppProvider = ({ children }) => {
             return [
                 { id: '1', name: 'المسؤول', role: 'admin', username: 'admin', password: '123', status: 'active', permissions: adminPermissions },
                 { id: '2', name: 'مهندس أحمد', role: 'engineer', username: 'ahmed', password: '123', status: 'active', permissions: { ...defaultPermissions, canViewDashboard: true, canManageContracts: true, canManageInventory: true, canManageCustomers: true } },
-                { id: '3', name: 'محمد فتوح', role: 'admin', username: 'mhmd', password: '123', status: 'active', permissions: adminPermissions }
+                { id: '3', name: 'محمد فتوح', role: 'admin', username: 'mhmd', password: '123', status: 'active', permissions: adminPermissions },
+                { id: '4', name: 'Mohamed Ahmed Shawkey', role: 'admin', username: 'absaif', password: '123', status: 'active', permissions: adminPermissions }
             ];
         }
     });
