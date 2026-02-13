@@ -188,7 +188,7 @@ const Employees = () => {
                     </div>
                 </div>
 
-                <div className="module-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                <div className="module-actions-container">
                     <button className="btn-bulk-pay" onClick={() => {
                         setSelectedForBulk([]);
                         setShowBulkModal(true);
@@ -201,9 +201,14 @@ const Employees = () => {
                             <span className="btn-bulk-subtitle">تحويل الرواتب دفعة واحدة</span>
                         </div>
                     </button>
-                    <button className="btn-primary" onClick={() => setShowModal(true)} style={{ height: '40px', padding: '0 20px', borderRadius: '10px', boxShadow: '0 8px 16px rgba(68, 184, 92, 0.2)' }}>
-                        <Plus size={20} />
-                        <span>إضافة موظف جديد</span>
+                    <button className="btn-add-employee-premium" onClick={() => setShowModal(true)}>
+                        <div className="btn-add-icon-wrapper">
+                            <Plus size={20} />
+                        </div>
+                        <div className="btn-add-content">
+                            <span className="btn-add-title">إضافة موظف</span>
+                            <span className="btn-add-subtitle">ضم عضو جديد للفريق</span>
+                        </div>
                     </button>
                 </div>
             </div>
@@ -551,23 +556,7 @@ const Employees = () => {
                 .selected .perm-checkbox {
                     color: var(--primary);
                 }
-                .bulk-pay-icon-wrapper {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 28px;
-                    height: 28px;
-                    background: rgba(var(--primary-rgb), 0.15);
-                    color: var(--primary);
-                    border-radius: 8px;
-                    transition: all 0.3s ease;
-                }
-                .btn-secondary:hover .bulk-pay-icon-wrapper {
-                    background: var(--primary);
-                    color: white;
-                    transform: scale(1.1);
-                    box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.4);
-                }
+
                 .role-badge {
                     display: inline-flex;
                     align-items: center;
@@ -584,23 +573,6 @@ const Employees = () => {
                     gap: 8px;
                     color: var(--text-secondary);
                 }
-                .btn-action-primary {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    padding: 6px 14px;
-                    background: rgba(70, 174, 76, 0.1);
-                    color: #46ae4c;
-                    border: none;
-                    border-radius: 8px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: 0.3s;
-                }
-                .btn-action-primary:hover {
-                    background: #46ae4c;
-                    color: white;
-                }
                 .table-actions {
                     display: flex;
                     gap: 12px;
@@ -614,23 +586,119 @@ const Employees = () => {
                     align-items: center;
                     justify-content: center;
                 }
-                .btn-bulk-pay {
+
+                .module-header {
+                    margin-bottom: 40px;
                     display: flex;
-                    align-items: center;
-                    gap: 12px;
-                    padding: 8px 20px 8px 16px;
-                    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                    border-radius: 14px;
-                    color: white;
-                    cursor: pointer;
-                    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                    position: relative;
-                    overflow: hidden;
-                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    gap: 24px;
+                    flex-wrap: wrap;
                 }
 
-                .btn-bulk-pay::before {
+                .module-info {
+                    flex: 1;
+                    min-width: 300px;
+                }
+
+                .module-actions-container {
+                    display: flex;
+                    gap: 16px;
+                    flex-wrap: wrap;
+                    justify-content: flex-end;
+                    align-items: center;
+                }
+
+                @media (max-width: 768px) {
+                    .module-actions-container {
+                        justify-content: center;
+                        width: 100%;
+                    }
+                    .btn-bulk-pay, .btn-add-employee-premium {
+                        flex: 1;
+                        min-width: 200px;
+                    }
+                }
+
+                .btn-bulk-pay, .btn-add-employee-premium {
+                    display: flex;
+                    align-items: center;
+                    gap: 14px;
+                    padding: 10px 20px 10px 16px;
+                    background: rgba(255, 255, 255, 0.03);
+                    border: 1px solid rgba(255, 255, 255, 0.08);
+                    border-radius: 16px;
+                    color: white;
+                    cursor: pointer;
+                    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+                    position: relative;
+                    overflow: hidden;
+                    backdrop-filter: blur(10px);
+                }
+
+                .btn-add-employee-premium {
+                    background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.15) 0%, rgba(var(--primary-rgb), 0.05) 100%);
+                    border-color: rgba(var(--primary-rgb), 0.3);
+                }
+
+                .btn-bulk-pay:hover, .btn-add-employee-premium:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+                    border-color: var(--primary);
+                }
+
+                .btn-bulk-icon-wrapper, .btn-add-icon-wrapper {
+                    width: 42px;
+                    height: 42px;
+                    border-radius: 12px;
+                    background: rgba(255, 255, 255, 0.05);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.3s ease;
+                }
+
+                .btn-add-icon-wrapper {
+                    background: var(--primary);
+                    color: black;
+                }
+
+                .btn-bulk-icon-wrapper {
+                    background: rgba(var(--primary-rgb), 0.2);
+                    color: var(--primary);
+                }
+
+                .btn-bulk-pay:hover .btn-bulk-icon-wrapper {
+                    background: var(--primary);
+                    color: black;
+                    transform: rotate(15deg);
+                }
+
+                .btn-add-employee-premium:hover .btn-add-icon-wrapper {
+                    transform: rotate(90deg) scale(1.1);
+                    box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.4);
+                }
+
+                .btn-bulk-content, .btn-add-content {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    text-align: right;
+                }
+
+                .btn-bulk-title, .btn-add-title {
+                    font-size: 15px;
+                    font-weight: 800;
+                    letter-spacing: -0.2px;
+                }
+
+                .btn-bulk-subtitle, .btn-add-subtitle {
+                    font-size: 11px;
+                    color: var(--text-secondary);
+                    font-weight: 500;
+                }
+
+                .btn-bulk-pay::after, .btn-add-employee-premium::after {
                     content: '';
                     position: absolute;
                     top: 0;
@@ -638,59 +706,7 @@ const Employees = () => {
                     width: 4px;
                     height: 100%;
                     background: var(--primary);
-                    transition: all 0.3s ease;
-                }
-
-                .btn-bulk-pay:hover {
-                    background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.15) 0%, rgba(var(--primary-rgb), 0.05) 100%);
-                    border-color: rgba(var(--primary-rgb), 0.3);
-                    transform: translateY(-3px) scale(1.02);
-                    box-shadow: 0 12px 25px rgba(var(--primary-rgb), 0.2);
-                }
-
-                .btn-bulk-pay:hover::before {
-                    width: 100%;
-                    opacity: 0.1;
-                }
-
-                .btn-bulk-icon-wrapper {
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 10px;
-                    background: rgba(var(--primary-rgb), 0.1);
-                    color: var(--primary);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.3s ease;
-                    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-                }
-
-                .btn-bulk-pay:hover .btn-bulk-icon-wrapper {
-                    background: var(--primary);
-                    color: black;
-                    transform: rotate(15deg) scale(1.1);
-                    box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.4);
-                }
-
-                .btn-bulk-content {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: flex-start;
-                    text-align: right;
-                }
-
-                .btn-bulk-title {
-                    font-size: 14px;
-                    font-weight: 800;
-                    letter-spacing: -0.2px;
-                }
-
-                .btn-bulk-subtitle {
-                    font-size: 10px;
-                    color: var(--text-secondary);
-                    font-weight: 500;
-                    opacity: 0.8;
+                    opacity: 0.6;
                 }
             `}</style>
         </div>
