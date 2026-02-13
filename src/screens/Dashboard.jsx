@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import {
     Users,
@@ -16,6 +16,7 @@ import { exportToExcel, formatters } from '../utils/excelExport';
 
 const Dashboard = () => {
     const { customers, contracts, purchases, inventory, transactions } = useApp();
+    const [activityLimit, setActivityLimit] = useState(5);
 
     const handleMasterExport = () => {
         const masterReport = {
@@ -33,12 +34,12 @@ const Dashboard = () => {
     const lowStockItems = inventory.filter(item => item.stock < 10).length;
 
     // Sort recent activities
-    const recentActivities = [
+    const ALL_ACTIVITIES = [
         ...contracts.map(c => ({
             type: 'contract',
-            name: c.customer?.name,
+            name: c.customer?.name || 'عقد جديد',
             date: new Date(c.savedAt || Date.now()),
-            detail: c.projectType
+            detail: c.projectType || 'مشروع سكنى'
         })),
         ...purchases.map(p => ({
             type: 'purchase',
@@ -46,7 +47,9 @@ const Dashboard = () => {
             date: new Date(p.date),
             detail: p.supplier
         }))
-    ].sort((a, b) => b.date - a.date).slice(0, 5);
+    ].sort((a, b) => b.date - a.date);
+
+    const recentActivities = ALL_ACTIVITIES.slice(0, activityLimit);
 
     return (
         <div className="page arabic-text dashboard-fade-in">
@@ -239,7 +242,12 @@ const Dashboard = () => {
                             <Clock className="text-secondary" size={20} />
                             <h3 className="chart-title">النشاطات الذكية</h3>
                         </div>
-                        <button className="view-all-btn">مشاهدة الكل</button>
+                        <button
+                            className="view-all-btn"
+                            onClick={() => setActivityLimit(prev => prev === 5 ? 20 : 5)}
+                        >
+                            {activityLimit === 5 ? 'مشاهدة الكل' : 'عرض أقل'}
+                        </button>
                     </div>
                     <div className="activity-list">
                         {recentActivities.length > 0 ? recentActivities.map((act, i) => (
