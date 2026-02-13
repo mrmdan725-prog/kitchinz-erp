@@ -18,7 +18,8 @@ import {
     Clock,
     LayoutGrid,
     List,
-    CheckCircle2
+    CheckCircle2,
+    Circle
 } from 'lucide-react';
 
 const Employees = () => {
