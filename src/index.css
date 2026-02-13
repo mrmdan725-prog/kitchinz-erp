@@ -30,6 +30,38 @@
   --glass-blur: blur(12px);
 }
 
+.light-theme {
+  --bg-main: #f0f2f5;
+  --bg-surface: rgba(255, 255, 255, 0.8);
+  --bg-glass: rgba(255, 255, 255, 0.4);
+  --text-primary: #1a1a1b;
+  --text-secondary: #4b4b52;
+  --text-muted: #8e8e9c;
+  --border-glass: rgba(0, 0, 0, 0.08);
+  --shadow-premium: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.light-theme::before {
+  background:
+    radial-gradient(circle at 20% 20%, hsla(var(--primary-h), 40%, 90%, 0.4) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, hsla(var(--primary-h), 40%, 85%, 0.3) 0%, transparent 40%);
+}
+
+.light-theme h1,
+.light-theme h2,
+.light-theme h3,
+.light-theme h4,
+.light-theme h5,
+.light-theme h6,
+.light-theme p,
+.light-theme span,
+.light-theme label,
+.light-theme input,
+.light-theme td,
+.light-theme th {
+  color: var(--text-primary);
+}
+
 * {
   margin: 0;
   padding: 0;

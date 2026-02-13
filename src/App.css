@@ -1127,6 +1127,227 @@ p.text-secondary {
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--bg-surface);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: rotate(15deg) scale(1.1);
+  box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.2);
+}
+
+.theme-toggle-btn svg {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.light-theme .theme-toggle-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Light Theme Component Overrides */
+.light-theme .glass {
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.light-theme .main-header {
+  background: rgba(255, 255, 255, 0.8);
+  border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+
+.light-theme .sidebar {
+  background: rgba(255, 255, 255, 0.9);
+  border-left-color: rgba(0, 0, 0, 0.05);
+}
+
+.light-theme .nav-item {
+  color: #4b4b52;
+}
+
+.light-theme .nav-item:hover,
+.light-theme .nav-item.active {
+  background: rgba(var(--primary-rgb), 0.1);
+  color: var(--primary);
+}
+
+.light-theme .card {
+  background: white !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+.light-theme .search-box input {
+  color: #1a1a1b !important;
+}
+
+.light-theme .search-box-wrapper .glass {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.light-theme .user-dropdown-menu {
+  background: white !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.light-theme .user-dropdown-menu * {
+  color: #4b4b52 !important;
+}
+
+.light-theme .dropdown-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.light-theme .main-header h1,
+.light-theme .btn-primary,
+.light-theme .btn-premium,
+.light-theme .title-premium,
+.light-theme .stat-value,
+.light-theme .stat-label,
+.light-theme .account-name,
+.light-theme .account-balance,
+.light-theme .card h3,
+.light-theme .card h4,
+.light-theme .hero-title,
+.light-theme .hero-subtitle,
+.light-theme .activity-name,
+.light-theme .activity-date,
+.light-theme .activity-meta p,
+.light-theme .hub-title,
+.light-theme .hub-subtitle,
+.light-theme .btn-export-excel,
+.light-theme .hamburger,
+.light-theme .hamburger::before,
+.light-theme .hamburger::after,
+.light-theme .mobile-menu-toggle {
+  color: var(--text-primary) !important;
+}
+
+.light-theme .hamburger,
+.light-theme .hamburger::before,
+.light-theme .hamburger::after {
+  background: var(--text-primary) !important;
+}
+
+.light-theme .btn-primary,
+.light-theme .btn-premium,
+.light-theme .btn-premium-primary {
+  color: #1a1a1b !important;
+}
+
+.light-theme .icon-wrapper-premium {
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: var(--text-primary) !important;
+}
+
+.light-theme .btn-premium-primary .icon-wrapper-premium {
+  background: var(--primary) !important;
+  color: #000 !important;
+}
+
+.light-theme .search-box input::placeholder {
+  color: var(--text-muted);
+}
+
+.light-theme .text-gradient {
+  background: linear-gradient(135deg, var(--primary), #1a1a1b);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.light-theme .modal,
+.light-theme .form-group input,
+.light-theme .form-group select,
+.light-theme .form-group textarea,
+.light-theme select,
+.light-theme option,
+.light-theme .status-select {
+  background: white !important;
+  color: #1a1a1b !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.light-theme .modal h3 {
+  background: linear-gradient(135deg, var(--primary), #1a1a1b);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.light-theme .form-group label {
+  color: #4b4b52 !important;
+}
+
+.light-theme .stat-card,
+.light-theme .dashboard-card {
+  background: white !important;
+  border-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.light-theme .table-container {
+  background: rgba(0, 0, 0, 0.03) !important;
+}
+
+.light-theme .data-table th {
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #1a1a1b !important;
+}
+
+.light-theme .data-table td {
+  border-bottom-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.light-theme .badge {
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #1a1a1b !important;
+}
+
+.light-theme .badge-success {
+  background: rgba(70, 174, 76, 0.1) !important;
+  color: #2e7d32 !important;
+}
+
+.light-theme .badge-danger {
+  background: rgba(255, 77, 77, 0.1) !important;
+  color: #c62828 !important;
+}
+
+.light-theme .text-primary {
+  color: var(--primary) !important;
+}
+
+.light-theme .text-secondary {
+  color: #4b4b52 !important;
+}
+
+.light-theme .text-muted {
+  color: #8e8e9c !important;
+}
+
+.light-theme .text-danger {
+  color: #ff4d4d !important;
+}
+
+.light-theme .text-success {
+  color: #2ecc71 !important;
+}
+
 .segment-btn {
   border: none;
   background: transparent;

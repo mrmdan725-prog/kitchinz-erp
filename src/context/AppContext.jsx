@@ -269,6 +269,26 @@ export const AppProvider = ({ children }) => {
     });
 
 
+    const [darkMode, setDarkMode] = useState(() => {
+        try {
+            const saved = localStorage.getItem('kitchinz_theme');
+            return saved ? JSON.parse(saved) : true; // Default to dark mode
+        } catch (e) {
+            return true;
+        }
+    });
+
+    useEffect(() => {
+        localStorage.setItem('kitchinz_theme', JSON.stringify(darkMode));
+        if (darkMode) {
+            document.body.classList.add('dark-theme');
+            document.body.classList.remove('light-theme');
+        } else {
+            document.body.classList.add('light-theme');
+            document.body.classList.remove('dark-theme');
+        }
+    }, [darkMode]);
+
     const [isCloudLoading, setIsCloudLoading] = useState(true);
 
     // Migration & Real-time Sync Logic (Supabase)
@@ -1178,7 +1198,9 @@ export const AppProvider = ({ children }) => {
             deletePurchase,
             addInventoryItem,
             updateInventoryItem,
-            deleteInventoryItem
+            deleteInventoryItem,
+            darkMode,
+            toggleDarkMode: () => setDarkMode(!darkMode)
         }}>
             {children}
         </AppContext.Provider>

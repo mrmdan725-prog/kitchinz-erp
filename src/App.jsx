@@ -16,7 +16,9 @@ import {
   Search,
   Command,
   ArrowRight,
-  Truck
+  Truck,
+  Sun,
+  Moon
 } from 'lucide-react';
 import logoImg from './assets/kitchinz_logo_v4.png';
 import { AppProvider, useApp } from './context/AppContext';
@@ -91,7 +93,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileMenuOpen, setIsMobileMen
 };
 
 const AppContent = () => {
-  const { currentUser, customers, contracts, invoices, logout, isCloudLoading } = useApp();
+  const { currentUser, customers, contracts, invoices, logout, isCloudLoading, darkMode, toggleDarkMode } = useApp();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [globalSearch, setGlobalSearch] = useState('');
@@ -192,6 +194,14 @@ const AppContent = () => {
           </div>
 
           <div className="intelligence-hub">
+            <button
+              className="theme-toggle-btn"
+              onClick={toggleDarkMode}
+              title={darkMode ? 'الوضع النهاري' : 'الوضع الليلي'}
+              style={{ marginLeft: '16px' }}
+            >
+              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
             <div className="search-box-wrapper" style={{ position: 'relative', minWidth: '400px' }}>
               <div className="search-box glass" style={{ marginBottom: 0, padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '12px', borderRadius: '14px' }}>
                 <Search size={18} className="text-secondary" />
