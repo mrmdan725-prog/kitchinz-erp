@@ -41,17 +41,24 @@ import InspectionDetails from './screens/InspectionDetails';
 import UserProfile from './screens/UserProfile';
 import Deliveries from './screens/Deliveries';
 
-const Logo = () => (
-  <div className="logo-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative' }}>
-    <svg style={{ position: 'absolute', width: 0, height: 0 }}>
-      <filter id="perfect-transparent">
-        {/* Precise mask: removes background while keeping green and white sharp */}
-        <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  3 3 3 0 -0.8" />
-      </filter>
-    </svg>
-    <img src={logoImg} alt="KITCHINZ Logo" className="sidebar-logo-img" style={{ filter: 'url(#perfect-transparent)' }} />
-  </div>
-);
+const Logo = () => {
+  const { darkMode } = useApp();
+  return (
+    <div className="logo-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative' }}>
+      <svg style={{ position: 'absolute', width: 0, height: 0 }}>
+        <filter id="perfect-transparent">
+          <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  3 3 3 0 -0.8" />
+        </filter>
+      </svg>
+      <img
+        src={logoImg}
+        alt="KITCHINZ Logo"
+        className="sidebar-logo-img"
+        style={{ filter: darkMode ? 'url(#perfect-transparent)' : 'none' }}
+      />
+    </div>
+  );
+};
 
 const NavItem = ({ to, icon: Icon, label, isCollapsed }) => {
   const location = useLocation();
@@ -190,7 +197,12 @@ const AppContent = () => {
             <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(true)}>
               <div className="hamburger"></div>
             </button>
-            <img src={logoImg} alt="KITCHINZ" className="header-logo" />
+            <img
+              src={logoImg}
+              alt="KITCHINZ"
+              className="header-logo"
+              style={{ filter: darkMode ? 'url(#perfect-transparent)' : 'none' }}
+            />
           </div>
 
           <div className="intelligence-hub">

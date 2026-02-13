@@ -31,14 +31,14 @@
 }
 
 .light-theme {
-  --bg-main: #f0f2f5;
-  --bg-surface: rgba(255, 255, 255, 0.8);
-  --bg-glass: rgba(255, 255, 255, 0.4);
-  --text-primary: #1a1a1b;
-  --text-secondary: #4b4b52;
-  --text-muted: #8e8e9c;
-  --border-glass: rgba(0, 0, 0, 0.08);
-  --shadow-premium: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --bg-main: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border-glass: rgba(0, 0, 0, 0.05);
+  --shadow-premium: 0 10px 30px rgba(0, 0, 0, 0.03);
 }
 
 .light-theme::before {
