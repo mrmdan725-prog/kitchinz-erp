@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { Plus, Printer, FileText, Search, Edit2, Edit, Clock, X, FileSpreadsheet, LayoutGrid, List, Eye, Trash2 } from 'lucide-react';
 import { exportToExcel, formatters } from '../utils/excelExport';
@@ -10,6 +10,7 @@ import ContractDetails from '../components/ContractDetails';
 const Contracts = () => {
     const { accounts, customers, contracts, addContract, updateContract, deleteContract, recordContractPayment, updateContractStatus, systemSettings, cancelContractPayment, addInvoice } = useApp();
     const location = useLocation();
+    const navigate = useNavigate();
     const [showForm, setShowForm] = useState(false);
     const [activeContract, setActiveContract] = useState(null);
     const [isPreviewMode, setIsPreviewMode] = useState(false);
@@ -35,9 +36,12 @@ const Contracts = () => {
                 setActiveContract({ customer });
                 setIsEditing(false);
                 setShowForm(true);
+
+                // Clear the state so it doesn't trigger again on re-render
+                navigate(location.pathname, { replace: true, state: {} });
             }
         }
-    }, [location.state, customers, activeContract, showForm, isPreviewMode]);
+    }, [location.state, customers, activeContract, showForm, isPreviewMode, location.pathname, navigate]);
 
     const handleContractCreateOrUpdate = (data, shouldSave = false) => {
         if (shouldSave) {
@@ -404,7 +408,10 @@ const Contracts = () => {
                                         customers={customers}
                                         initialData={isEditing ? activeContract : null}
                                         onSubmit={handleContractCreateOrUpdate}
-                                        onCancel={() => setShowForm(false)}
+                                        onCancel={() => {
+                                            setShowForm(false);
+                                            setActiveContract(null);
+                                        }}
                                     />
                                 </div>
                             </div>
