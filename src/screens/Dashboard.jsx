@@ -74,6 +74,31 @@ const Dashboard = () => {
                 <div className="hero-decoration"></div>
             </div>
 
+            {/* Quick Actions (Integrated Hub) - Moved here */}
+            <div className="card glass dashboard-hub" style={{ marginBottom: '30px' }}>
+                <div className="hub-header">
+                    <h3 className="hub-title">اختصارات سريعة للمبدعين 🎨</h3>
+                    <p className="text-secondary hub-subtitle">قم بإنجاز مهامك اليومية بسرعة فائقة</p>
+                </div>
+                <div className="hub-actions">
+                    {[
+                        { label: 'عقد جديد', icon: Plus, link: '/contracts', color: 'var(--primary)' },
+                        { label: 'إضافة عميل', icon: Users, link: '/customers', color: '#3498db' },
+                        { label: 'طلب شراء', icon: ShoppingCart, link: '/purchasing', color: '#e67e22' },
+                        { label: 'معاينة فنية', icon: Eye, link: '/inspections', color: '#9b59b6' }
+                    ].map((btn, i) => (
+                        <button
+                            key={i}
+                            className="quick-action-btn github-style glass-interactive"
+                            onClick={() => window.location.href = btn.link}
+                        >
+                            <btn.icon size={20} style={{ color: btn.color }} />
+                            <span className="btn-label">{btn.label}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+
             {/* KPI Cards */}
             <div className="stats-grid dashboard-stats">
                 <div className="dashboard-card glass">
@@ -238,30 +263,6 @@ const Dashboard = () => {
                             <p className="text-secondary empty-msg">لا توجد نشاطات مؤخراً</p>
                         )}
                     </div>
-                </div>
-            </div>
-            {/* Quick Actions (Integrated Hub) */}
-            <div className="card glass dashboard-hub">
-                <div className="hub-header">
-                    <h3 className="hub-title">اختصارات سريعة للمبدعين 🎨</h3>
-                    <p className="text-secondary hub-subtitle">قم بإنجاز مهامك اليومية بسرعة فائقة</p>
-                </div>
-                <div className="hub-actions">
-                    {[
-                        { label: 'عقد جديد', icon: Plus, link: '/contracts', color: 'var(--primary)' },
-                        { label: 'إضافة عميل', icon: Users, link: '/customers', color: '#3498db' },
-                        { label: 'طلب شراء', icon: ShoppingCart, link: '/purchasing', color: '#e67e22' },
-                        { label: 'معاينة فنية', icon: Eye, link: '/inspections', color: '#9b59b6' }
-                    ].map((btn, i) => (
-                        <button
-                            key={i}
-                            className="quick-action-btn github-style glass-interactive"
-                            onClick={() => window.location.href = btn.link}
-                        >
-                            <btn.icon size={20} style={{ color: btn.color }} />
-                            <span className="btn-label">{btn.label}</span>
-                        </button>
-                    ))}
                 </div>
             </div>
         </div>
