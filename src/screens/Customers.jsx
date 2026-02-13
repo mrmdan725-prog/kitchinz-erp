@@ -42,7 +42,8 @@ const Customers = () => {
         updateInspection,
         deleteInspection,
         addInvoice,
-        systemSettings
+        systemSettings,
+        contractOptions
     } = useApp();
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
@@ -54,7 +55,7 @@ const Customers = () => {
         phone: '',
         address: '',
         email: '',
-        projectType: 'kitchen' // Default to kitchen
+        projectType: 'مطبخ' // Default to match contractOptions
     });
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
@@ -79,7 +80,7 @@ const Customers = () => {
         }
         setShowModal(false);
         setIsEditing(false);
-        setFormData({ name: '', phone: '', address: '', email: '', projectType: 'kitchen' });
+        setFormData({ name: '', phone: '', address: '', email: '', projectType: 'مطبخ' });
     };
 
     const handlePurchaseSubmit = (e) => {
@@ -150,7 +151,13 @@ const Customers = () => {
     const handleEditClick = (e, customer) => {
         e.stopPropagation();
         setSelectedCustomer(customer);
-        setFormData({ name: customer.name, phone: customer.phone, address: customer.address || '', email: customer.email || '' });
+        setFormData({
+            name: customer.name,
+            phone: customer.phone,
+            address: customer.address || '',
+            email: customer.email || '',
+            projectType: customer.projectType || 'مطبخ'
+        });
         setIsEditing(true);
         setShowModal(true);
     };
@@ -334,6 +341,9 @@ const Customers = () => {
                             </div>
                             <div className="form-group">
                                 <label>نوع المشروع</label>
+                                <datalist id="project-types">
+                                    {contractOptions.projectTypes?.map(type => <option key={type} value={type} />)}
+                                </datalist>
                                 <select
                                     value={formData.projectType}
                                     onChange={e => setFormData({ ...formData, projectType: e.target.value })}
@@ -348,9 +358,10 @@ const Customers = () => {
                                         cursor: 'pointer'
                                     }}
                                 >
-                                    <option value="kitchen" style={{ background: '#1a1a1a', color: 'white' }}>مطبخ</option>
-                                    <option value="dressing" style={{ background: '#1a1a1a', color: 'white' }}>دريسنج روم</option>
-                                    <option value="both" style={{ background: '#1a1a1a', color: 'white' }}>كلاهما (مطبخ + دريسنج)</option>
+                                    <option value="">اختر نوع المشروع...</option>
+                                    {contractOptions.projectTypes?.map(type => (
+                                        <option key={type} value={type} style={{ background: '#1a1a1a', color: 'white' }}>{type}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="modal-actions">

@@ -214,7 +214,11 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
                                         value={formData.customer?.id || ''}
                                         onChange={e => {
                                             const customer = customers.find(c => String(c.id) === String(e.target.value));
-                                            setFormData({ ...formData, customer });
+                                            setFormData({
+                                                ...formData,
+                                                customer,
+                                                projectType: customer?.projectType || formData.projectType
+                                            });
                                         }}
                                     >
                                         <option value="">اختر العميل...</option>
