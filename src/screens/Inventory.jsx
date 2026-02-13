@@ -4,7 +4,8 @@ import { Package, AlertTriangle, ArrowUpRight, Plus, Edit, Trash2, FileSpreadshe
 import { exportToExcel, formatters } from '../utils/excelExport';
 
 const Inventory = () => {
-    const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem } = useApp();
+    const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, contractOptions } = useApp();
+
     const [showModal, setShowModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
