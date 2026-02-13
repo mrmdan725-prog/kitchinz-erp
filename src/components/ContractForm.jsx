@@ -3,56 +3,12 @@ import { RotateCcw, Save, Eye, LogOut } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import './ContractForm.css';
 
-const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
+const ContractForm = ({ customers, onSubmit, onCancel, initialData, isEditing: isEditingProp }) => {
     const { contractOptions, systemSettings } = useApp();
-    const isEditing = !!initialData;
+    const isEditing = isEditingProp !== undefined ? isEditingProp : (!!initialData && !!initialData.id);
+
     const [formData, setFormData] = useState(() => {
-        if (initialData) {
-            // Migration logic for old data structures
-            const base = { ...initialData };
-
-            // Map 'dimensions' to 'woodSpecs' if needed
-            if (!base.woodSpecs && base.dimensions) {
-                base.woodSpecs = [
-                    { label: 'الضلف السفلية', type: base.dimensions[0]?.type || '', totalArea: base.dimensions[0]?.totalArea || '', pricePerMeter: base.dimensions[0]?.pricePerMeter || '', totalPrice: base.dimensions[0]?.totalPrice || '0' },
-                    { label: 'الضلف العلوية', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' },
-                    { label: 'البلاكار ( إن وجد )', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' },
-                    { label: 'التجاليد ( إن وجد )', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' }
-                ];
-            } else if (!base.woodSpecs) {
-                base.woodSpecs = [
-                    { label: 'الضلف السفلية', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' },
-                    { label: 'الضلف العلوية', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' },
-                    { label: 'البلاكار ( إن وجد )', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' },
-                    { label: 'التجاليد ( إن وجد )', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' }
-                ];
-            }
-
-            // Ensure components object exists
-            if (!base.components) {
-                base.components = {
-                    innerShellType: initialData.innerShellType || '',
-                    hinges: '',
-                    slides: '',
-                    upperHandles: initialData.upperHandles || '',
-                    lowerHandles: initialData.lowerHandles || '',
-                    closetHandles: '',
-                    hanging: '',
-                    flipUps: '',
-                    legs: '',
-                    toeKick: ''
-                };
-            }
-
-            // Ensure accessories is a clean array
-            if (!base.accessories || !Array.isArray(base.accessories)) {
-                base.accessories = [];
-            }
-
-            return base;
-        }
-
-        return {
+        const defaults = {
             contractDate: new Date().toISOString().split('T')[0],
             representative: systemSettings.representativeName || '',
             firstPartyNationalId: systemSettings.representativeNationalId || '',
@@ -94,6 +50,36 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
             operation: '0',
             delivery: '0'
         };
+
+        if (initialData) {
+            // Merge defaults with initialData
+            const base = { ...defaults, ...initialData };
+
+            // Map 'dimensions' to 'woodSpecs' if needed
+            if (!base.woodSpecs && base.dimensions) {
+                base.woodSpecs = [
+                    { label: 'الضلف السفلية', type: base.dimensions[0]?.type || '', totalArea: base.dimensions[0]?.totalArea || '', pricePerMeter: base.dimensions[0]?.pricePerMeter || '', totalPrice: base.dimensions[0]?.totalPrice || '0' },
+                    { label: 'الضلف العلوية', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' },
+                    { label: 'البلاكار ( إن وجد )', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' },
+                    { label: 'التجاليد ( إن وجد )', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' }
+                ];
+            }
+
+            // Ensure components object exists
+            if (!base.components) {
+                base.components = { ...defaults.components };
+            }
+
+            // Sync project type and national ID if customer is provided but fields are empty
+            if (base.customer) {
+                if (!base.projectType) base.projectType = base.customer.projectType || '';
+                if (!base.customerNationalId) base.customerNationalId = base.customer.nationalId || '';
+            }
+
+            return base;
+        }
+
+        return defaults;
     });
 
     // Auto-calculate totals
@@ -217,7 +203,8 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData }) => {
                                             setFormData({
                                                 ...formData,
                                                 customer,
-                                                projectType: customer?.projectType || formData.projectType
+                                                projectType: customer?.projectType || formData.projectType,
+                                                customerNationalId: customer?.nationalId || formData.customerNationalId
                                             });
                                         }}
                                     >

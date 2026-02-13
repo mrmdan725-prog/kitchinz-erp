@@ -406,7 +406,8 @@ const Contracts = () => {
                                 <div className="modal glass" style={{ maxWidth: '900px' }}>
                                     <ContractForm
                                         customers={customers}
-                                        initialData={isEditing ? activeContract : null}
+                                        initialData={activeContract}
+                                        isEditing={isEditing}
                                         onSubmit={handleContractCreateOrUpdate}
                                         onCancel={() => {
                                             setShowForm(false);
