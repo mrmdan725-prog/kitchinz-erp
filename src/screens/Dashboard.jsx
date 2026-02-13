@@ -10,7 +10,9 @@ import {
     ArrowUpRight,
     Plus,
     Eye,
-    FileSpreadsheet
+    FileSpreadsheet,
+    ChevronDown,
+    ChevronUp
 } from 'lucide-react';
 import { exportToExcel, formatters } from '../utils/excelExport';
 
@@ -243,10 +245,11 @@ const Dashboard = () => {
                             <h3 className="chart-title">النشاطات الذكية</h3>
                         </div>
                         <button
-                            className="view-all-btn"
+                            className="view-all-btn glass-btn"
                             onClick={() => setActivityLimit(prev => prev === 5 ? 20 : 5)}
                         >
-                            {activityLimit === 5 ? 'مشاهدة الكل' : 'عرض أقل'}
+                            <span>{activityLimit === 5 ? 'مشاهدة الكل' : 'عرض أقل'}</span>
+                            {activityLimit === 5 ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
                         </button>
                     </div>
                     <div className="activity-list">
