@@ -189,12 +189,17 @@ const Employees = () => {
                 </div>
 
                 <div className="module-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                    <button className="btn-secondary" onClick={() => {
+                    <button className="btn-bulk-pay" onClick={() => {
                         setSelectedForBulk([]);
                         setShowBulkModal(true);
-                    }} style={{ height: '40px', padding: '0 16px', borderRadius: '10px' }}>
-                        <CircleDollarSign size={18} />
-                        <span>صرف جماعي</span>
+                    }}>
+                        <div className="btn-bulk-icon-wrapper">
+                            <CircleDollarSign size={20} />
+                        </div>
+                        <div className="btn-bulk-content">
+                            <span className="btn-bulk-title">صرف جماعي</span>
+                            <span className="btn-bulk-subtitle">تحويل الرواتب دفعة واحدة</span>
+                        </div>
                     </button>
                     <button className="btn-primary" onClick={() => setShowModal(true)} style={{ height: '40px', padding: '0 20px', borderRadius: '10px', boxShadow: '0 8px 16px rgba(68, 184, 92, 0.2)' }}>
                         <Plus size={20} />
@@ -608,6 +613,84 @@ const Employees = () => {
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                }
+                .btn-bulk-pay {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 8px 20px 8px 16px;
+                    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 14px;
+                    color: white;
+                    cursor: pointer;
+                    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                    position: relative;
+                    overflow: hidden;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                }
+
+                .btn-bulk-pay::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    width: 4px;
+                    height: 100%;
+                    background: var(--primary);
+                    transition: all 0.3s ease;
+                }
+
+                .btn-bulk-pay:hover {
+                    background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.15) 0%, rgba(var(--primary-rgb), 0.05) 100%);
+                    border-color: rgba(var(--primary-rgb), 0.3);
+                    transform: translateY(-3px) scale(1.02);
+                    box-shadow: 0 12px 25px rgba(var(--primary-rgb), 0.2);
+                }
+
+                .btn-bulk-pay:hover::before {
+                    width: 100%;
+                    opacity: 0.1;
+                }
+
+                .btn-bulk-icon-wrapper {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 10px;
+                    background: rgba(var(--primary-rgb), 0.1);
+                    color: var(--primary);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                }
+
+                .btn-bulk-pay:hover .btn-bulk-icon-wrapper {
+                    background: var(--primary);
+                    color: black;
+                    transform: rotate(15deg) scale(1.1);
+                    box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.4);
+                }
+
+                .btn-bulk-content {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    text-align: right;
+                }
+
+                .btn-bulk-title {
+                    font-size: 14px;
+                    font-weight: 800;
+                    letter-spacing: -0.2px;
+                }
+
+                .btn-bulk-subtitle {
+                    font-size: 10px;
+                    color: var(--text-secondary);
+                    font-weight: 500;
+                    opacity: 0.8;
                 }
             `}</style>
         </div>
