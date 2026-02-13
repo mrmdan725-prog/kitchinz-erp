@@ -65,10 +65,15 @@ const Dashboard = () => {
                         أهلاً بك مجدداً في مركز القيادة الذكي. إليك نظرة شاملة على تطور أعمالك اليوم.
                     </p>
                 </div>
-                <div className="hero-actions" style={{ display: 'flex', gap: '10px' }}>
-                    <button className="btn-export-excel" onClick={handleMasterExport} title="تصدير التقرير الشامل لإكسل">
-                        <FileSpreadsheet size={18} />
-                        التقرير الشامل (إكسل)
+                <div className="hero-actions" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <button className="btn-premium btn-premium-primary" onClick={handleMasterExport}>
+                        <div className="icon-wrapper-premium">
+                            <FileSpreadsheet size={20} />
+                        </div>
+                        <div className="content-premium">
+                            <span className="title-premium">التقرير الشامل</span>
+                            <span className="subtitle-premium">تصدير كافة البيانات لإكسل</span>
+                        </div>
                     </button>
                     <div className="stat-badge glass">
                         <ArrowUpRight size={18} className="text-primary" />

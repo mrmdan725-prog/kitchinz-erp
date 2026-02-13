@@ -189,25 +189,25 @@ const Employees = () => {
                 </div>
 
                 <div className="module-actions-container">
-                    <button className="btn-bulk-pay" onClick={() => {
+                    <button className="btn-premium" onClick={() => {
                         setSelectedForBulk([]);
                         setShowBulkModal(true);
                     }}>
-                        <div className="btn-bulk-icon-wrapper">
+                        <div className="icon-wrapper-premium">
                             <CircleDollarSign size={20} />
                         </div>
-                        <div className="btn-bulk-content">
-                            <span className="btn-bulk-title">صرف جماعي</span>
-                            <span className="btn-bulk-subtitle">تحويل الرواتب دفعة واحدة</span>
+                        <div className="content-premium">
+                            <span className="title-premium">صرف جماعي</span>
+                            <span className="subtitle-premium">تحويل الرواتب دفعة واحدة</span>
                         </div>
                     </button>
-                    <button className="btn-add-employee-premium" onClick={() => setShowModal(true)}>
-                        <div className="btn-add-icon-wrapper">
+                    <button className="btn-premium btn-premium-primary" onClick={() => setShowModal(true)}>
+                        <div className="icon-wrapper-premium">
                             <Plus size={20} />
                         </div>
-                        <div className="btn-add-content">
-                            <span className="btn-add-title">إضافة موظف</span>
-                            <span className="btn-add-subtitle">ضم عضو جديد للفريق</span>
+                        <div className="content-premium">
+                            <span className="title-premium">إضافة موظف</span>
+                            <span className="subtitle-premium">ضم عضو جديد للفريق</span>
                         </div>
                     </button>
                 </div>
@@ -614,99 +614,10 @@ const Employees = () => {
                         justify-content: center;
                         width: 100%;
                     }
-                    .btn-bulk-pay, .btn-add-employee-premium {
+                    .btn-premium {
                         flex: 1;
                         min-width: 200px;
                     }
-                }
-
-                .btn-bulk-pay, .btn-add-employee-premium {
-                    display: flex;
-                    align-items: center;
-                    gap: 14px;
-                    padding: 10px 20px 10px 16px;
-                    background: rgba(255, 255, 255, 0.03);
-                    border: 1px solid rgba(255, 255, 255, 0.08);
-                    border-radius: 16px;
-                    color: white;
-                    cursor: pointer;
-                    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-                    position: relative;
-                    overflow: hidden;
-                    backdrop-filter: blur(10px);
-                }
-
-                .btn-add-employee-premium {
-                    background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.15) 0%, rgba(var(--primary-rgb), 0.05) 100%);
-                    border-color: rgba(var(--primary-rgb), 0.3);
-                }
-
-                .btn-bulk-pay:hover, .btn-add-employee-premium:hover {
-                    transform: translateY(-4px);
-                    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-                    border-color: var(--primary);
-                }
-
-                .btn-bulk-icon-wrapper, .btn-add-icon-wrapper {
-                    width: 42px;
-                    height: 42px;
-                    border-radius: 12px;
-                    background: rgba(255, 255, 255, 0.05);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.3s ease;
-                }
-
-                .btn-add-icon-wrapper {
-                    background: var(--primary);
-                    color: black;
-                }
-
-                .btn-bulk-icon-wrapper {
-                    background: rgba(var(--primary-rgb), 0.2);
-                    color: var(--primary);
-                }
-
-                .btn-bulk-pay:hover .btn-bulk-icon-wrapper {
-                    background: var(--primary);
-                    color: black;
-                    transform: rotate(15deg);
-                }
-
-                .btn-add-employee-premium:hover .btn-add-icon-wrapper {
-                    transform: rotate(90deg) scale(1.1);
-                    box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.4);
-                }
-
-                .btn-bulk-content, .btn-add-content {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: flex-start;
-                    text-align: right;
-                }
-
-                .btn-bulk-title, .btn-add-title {
-                    font-size: 15px;
-                    font-weight: 800;
-                    letter-spacing: -0.2px;
-                }
-
-                .btn-bulk-subtitle, .btn-add-subtitle {
-                    font-size: 11px;
-                    color: var(--text-secondary);
-                    font-weight: 500;
-                }
-
-                .btn-bulk-pay::after, .btn-add-employee-premium::after {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    width: 4px;
-                    height: 100%;
-                    background: var(--primary);
-                    opacity: 0.6;
                 }
             `}</style>
         </div>

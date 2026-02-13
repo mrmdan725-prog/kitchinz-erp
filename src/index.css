@@ -6,6 +6,7 @@
   --primary-s: 42%;
   --primary-l: 48%;
   --primary: hsl(var(--primary-h), var(--primary-s), var(--primary-l));
+  --primary-rgb: 70, 174, 76;
   --primary-glow: hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.4);
 
   --bg-main: #0a0a0b;

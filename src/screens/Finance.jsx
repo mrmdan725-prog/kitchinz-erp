@@ -298,15 +298,20 @@ const Finance = () => {
                     </div>
                 </div>
 
-                <div className="module-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                    <button className="btn-export-excel glass-interactive" onClick={handleExport} style={{ height: '40px', padding: '0 16px', borderRadius: '10px' }}>
+                <div className="module-actions" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'flex-end', alignItems: 'center' }}>
+                    <button className="btn-export-excel glass-interactive" onClick={handleExport}>
                         <FileSpreadsheet size={16} />
                         تصدير البيانات
                     </button>
 
-                    <button className="btn-primary" onClick={() => setShowAddModal(true)} style={{ height: '40px', padding: '0 20px', borderRadius: '10px', boxShadow: '0 8px 16px rgba(68, 184, 92, 0.2)' }}>
-                        <Plus size={20} />
-                        <span>إضافة عملية مالية</span>
+                    <button className="btn-premium btn-premium-primary" onClick={() => setShowAddModal(true)}>
+                        <div className="icon-wrapper-premium">
+                            <Plus size={20} />
+                        </div>
+                        <div className="content-premium">
+                            <span className="title-premium">إضافة حركة</span>
+                            <span className="subtitle-premium">تسجيل وارد أو مصروف جديد</span>
+                        </div>
                     </button>
                 </div>
             </div>

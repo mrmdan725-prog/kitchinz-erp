@@ -195,14 +195,19 @@ const Customers = () => {
                     <Plus size={24} className="text-primary" />
                     <h2>إدارة العملاء</h2>
                 </div>
-                <div style={{ display: 'flex', gap: '10px' }}>
+                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                     <button className="btn-export-excel" onClick={handleExport} title="تصدير لإكسل">
                         <FileSpreadsheet size={18} />
                         تصدير البيانات
                     </button>
-                    <button className="btn-primary" onClick={() => setShowModal(true)}>
-                        <Plus size={18} />
-                        إضافة عميل
+                    <button className="btn-premium btn-premium-primary" onClick={() => setShowModal(true)}>
+                        <div className="icon-wrapper-premium">
+                            <Plus size={20} />
+                        </div>
+                        <div className="content-premium">
+                            <span className="title-premium">إضافة عميل</span>
+                            <span className="subtitle-premium">تسجيل بيانات عميل جديد</span>
+                        </div>
                     </button>
                 </div>
             </div>
