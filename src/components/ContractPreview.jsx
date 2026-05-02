@@ -30,7 +30,7 @@ const ContractHeader = ({ data, dayName, formattedDate }) => (
                 )}
             </div>
 
-            <div className="intro-row" style={{ paddingRight: '15px', marginBottom: '12px' }}>
+            <div className="intro-row" style={{ marginBottom: '12px' }}>
                 <span style={{ fontWeight: '400' }}>السادة معرض </span>
                 <span style={{ fontWeight: '950', margin: '0 4px', fontFamily: "'Noto Sans', sans-serif" }}>
                     <span style={{ color: 'var(--logo-green)' }}>K</span>
@@ -96,8 +96,13 @@ const SpecificationsTable = ({ woodSpecs = [] }) => {
                         'الضلف العلوية',
                         'البلاكار ( إن وجد )',
                         'التجاليد ( إن وجد )'
-                    ].map((label, idx) => {
-                        // Find by exact or partial label match to handle legacy spelling
+                    ].filter(label => {
+                        const wood = woodSpecs.find(w => w.label && (w.label === label || w.label.includes(label.replace('إن', 'ان').trim()) || w.label.includes(label.replace('ان', 'إن').trim()))) || {};
+                        const hasType = wood.type && wood.type.trim() !== '';
+                        const hasArea = wood.totalArea && Number(wood.totalArea) !== 0;
+                        const hasPrice = wood.totalPrice && Number(wood.totalPrice) !== 0;
+                        return hasType || hasArea || hasPrice;
+                    }).map((label, idx) => {
                         const wood = woodSpecs.find(w => w.label && (w.label === label || w.label.includes(label.replace('إن', 'ان').trim()) || w.label.includes(label.replace('ان', 'إن').trim()))) || {};
                         return (
                             <tr key={idx}>
@@ -124,36 +129,46 @@ const InternalComponentsTable = ({ components = {} }) => (
         <div className="table-side-label"><div className="side-label-text" style={{ color: '#000' }}>المكونات الاساسية</div></div>
         <table className="contract-table">
             <tbody>
-                <tr>
-                    <td style={{ fontWeight: 'bold', width: '38%', whiteSpace: 'nowrap' }}>نوع العلب الداخلية</td>
-                    <td style={{ width: '12%' }} contentEditable={true} suppressContentEditableWarning={true}>{components.innerShellType}</td>
-                    <td style={{ fontWeight: 'bold', width: '38%', whiteSpace: 'nowrap' }}>تعليقة</td>
-                    <td style={{ width: '12%' }} contentEditable={true} suppressContentEditableWarning={true}>{components.hanging}</td>
-                </tr>
-                <tr>
-                    <td style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>مفصلات</td>
-                    <td contentEditable={true} suppressContentEditableWarning={true}>{components.hinges}</td>
-                    <td style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>قلابات</td>
-                    <td contentEditable={true} suppressContentEditableWarning={true}>{components.flipUps}</td>
-                </tr>
-                <tr>
-                    <td style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>مجر</td>
-                    <td contentEditable={true} suppressContentEditableWarning={true}>{components.slides}</td>
-                    <td style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>رجول</td>
-                    <td contentEditable={true} suppressContentEditableWarning={true}>{components.legs}</td>
-                </tr>
-                <tr>
-                    <td style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>مقابض العلب العلوية</td>
-                    <td contentEditable={true} suppressContentEditableWarning={true}>{components.upperHandles}</td>
-                    <td style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>وزر</td>
-                    <td contentEditable={true} suppressContentEditableWarning={true}>{components.toeKick}</td>
-                </tr>
-                <tr>
-                    <td style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>مقابض العلب السفلية</td>
-                    <td contentEditable={true} suppressContentEditableWarning={true}>{components.lowerHandles}</td>
-                    <td style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>مقابض البلاكار</td>
-                    <td contentEditable={true} suppressContentEditableWarning={true}>{components.closetHandles}</td>
-                </tr>
+                {(components.innerShellType || components.hanging) && (
+                    <tr>
+                        <td style={{ fontWeight: 'bold', width: '28%', whiteSpace: 'nowrap' }}>نوع العلب الداخلية</td>
+                        <td style={{ width: '22%' }} contentEditable={true} suppressContentEditableWarning={true}>{components.innerShellType}</td>
+                        <td style={{ fontWeight: 'bold', width: '28%', whiteSpace: 'nowrap' }}>تعليقة</td>
+                        <td style={{ width: '22%' }} contentEditable={true} suppressContentEditableWarning={true}>{components.hanging}</td>
+                    </tr>
+                )}
+                {(components.hinges || components.flipUps) && (
+                    <tr>
+                        <td style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>مفصلات</td>
+                        <td contentEditable={true} suppressContentEditableWarning={true}>{components.hinges}</td>
+                        <td style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>قلابات</td>
+                        <td contentEditable={true} suppressContentEditableWarning={true}>{components.flipUps}</td>
+                    </tr>
+                )}
+                {(components.slides || components.legs) && (
+                    <tr>
+                        <td style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>مجر</td>
+                        <td contentEditable={true} suppressContentEditableWarning={true}>{components.slides}</td>
+                        <td style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>رجول</td>
+                        <td contentEditable={true} suppressContentEditableWarning={true}>{components.legs}</td>
+                    </tr>
+                )}
+                {(components.upperHandles || components.toeKick) && (
+                    <tr>
+                        <td style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>مقابض العلب العلوية</td>
+                        <td contentEditable={true} suppressContentEditableWarning={true}>{components.upperHandles}</td>
+                        <td style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>وزر</td>
+                        <td contentEditable={true} suppressContentEditableWarning={true}>{components.toeKick}</td>
+                    </tr>
+                )}
+                {(components.lowerHandles || components.closetHandles) && (
+                    <tr>
+                        <td style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>مقابض العلب السفلية</td>
+                        <td contentEditable={true} suppressContentEditableWarning={true}>{components.lowerHandles}</td>
+                        <td style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>مقابض البلاكار</td>
+                        <td contentEditable={true} suppressContentEditableWarning={true}>{components.closetHandles}</td>
+                    </tr>
+                )}
             </tbody>
         </table>
     </div>
@@ -175,7 +190,7 @@ const AccessoriesTable = ({ accessories = [] }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {accessories.map((acc, idx) => (
+                    {accessories.filter(acc => acc.name && acc.name.trim() !== '').map((acc, idx) => (
                         <tr key={idx}>
                             <td style={{ width: '35px' }}>{idx + 1}</td>
                             <td style={{ textAlign: 'right' }} contentEditable={true} suppressContentEditableWarning={true}>{acc?.name || ''}</td>
@@ -195,9 +210,10 @@ const AccessoriesTable = ({ accessories = [] }) => {
 };
 
 const MarbleTable = ({ marble = {} }) => {
+    if (!marble.type || marble.type.trim() === '') return null;
     return (
         <div className="table-wrapper-with-label">
-            <div className="table-side-label"><div className="side-label-text">بند الرخام</div></div>
+            <div className="table-side-label"><div className="side-label-text">الرخام</div></div>
             <table className="contract-table">
                 <thead>
                     <tr>
@@ -227,7 +243,7 @@ const GrandTotalSection = ({ data }) => {
     const calculatedGrandTotal = woodTotal + accTotal + marbleTotal;
 
     return (
-        <div className="footer-pricing-area" style={{ marginTop: '10px' }}>
+        <div className="footer-pricing-area">
             <div className="grand-total-section">
                 <span className="total-label-text">التكلفة الاجمالية بعد الاضافات</span>
                 <span className="total-amount-tag" contentEditable={true} suppressContentEditableWarning={true}>{data.grandTotal || calculatedGrandTotal}</span>
@@ -245,24 +261,24 @@ const PaymentSplitsSection = ({ data }) => {
     const calculatedGrandTotal = woodTotal + accTotal + marbleTotal;
 
     return (
-        <div className="footer-pricing-area">
-            <div className="payment-tab-header">قيمة الدفعات</div>
+        <div className="table-wrapper-with-label payment-splits-wrapper">
+            <div className="table-side-label"><div className="side-label-text">قيمة الدفعات</div></div>
             <table className="payment-table">
                 <tbody>
                     <tr>
-                        <td style={{ width: '40%' }}>دفع تعاقد 60 %</td>
+                        <td style={{ width: '40%', fontWeight: 'bold' }}>دفع تعاقد 60 %</td>
                         <td style={{ width: '25%' }} contentEditable={true} suppressContentEditableWarning={true}>{data.deposit || (calculatedGrandTotal * 0.6).toFixed(0)}</td>
-                        <td style={{ width: '35%' }} contentEditable={true} suppressContentEditableWarning={true}>أثناء التعاقد</td>
+                        <td style={{ width: '35%', fontWeight: 'bold' }}>أثناء التعاقد</td>
                     </tr>
                     <tr>
-                        <td>دفع تشغيل 30 %</td>
+                        <td style={{ fontWeight: 'bold' }}>دفع تشغيل 30 %</td>
                         <td contentEditable={true} suppressContentEditableWarning={true}>{data.operation || (calculatedGrandTotal * 0.3).toFixed(0)}</td>
-                        <td contentEditable={true} suppressContentEditableWarning={true}>أثناء التشغيل</td>
+                        <td style={{ fontWeight: 'bold' }}>أثناء التشغيل</td>
                     </tr>
                     <tr>
-                        <td>دفع استلام 10 %</td>
+                        <td style={{ fontWeight: 'bold' }}>دفع استلام 10 %</td>
                         <td contentEditable={true} suppressContentEditableWarning={true}>{data.delivery || (calculatedGrandTotal * 0.1).toFixed(0)}</td>
-                        <td contentEditable={true} suppressContentEditableWarning={true}>قبل الاستلام</td>
+                        <td style={{ fontWeight: 'bold' }}>قبل الاستلام</td>
                     </tr>
                 </tbody>
             </table>
@@ -299,8 +315,6 @@ const ContractTermsPage = ({ data = {} }) => (
                 <span className="terms-header-text">بنود التعاقد</span>
             </div>
             <div className="terms-page-content">
-                <div className="contract-watermark" style={{ top: '40%' }}>K</div>
-
                 <div className="terms-list-container">
                     {CONTRACT_TERMS.map((term, idx) => (
                         <div key={idx} className="term-item">
@@ -311,8 +325,8 @@ const ContractTermsPage = ({ data = {} }) => (
                 </div>
             </div>
         </div>
-        <div style={{ marginTop: 'auto', width: '100%' }}>
-            <SignaturesSection showTerms={false} />
+        <div style={{ marginTop: '20px', width: '100%' }}>
+            <SignaturesSection showTerms={true} />
         </div>
     </div>
 );
@@ -369,10 +383,6 @@ const ContractPreview = ({ data = {} }) => {
                         <SpecificationsTable woodSpecs={data.woodSpecs} />
                         <InternalComponentsTable components={data.components} />
                         <AccessoriesTable accessories={data.accessories} />
-                        {data.marble && (data.marble.type || data.marble.total > 0) && (
-                            <MarbleTable marble={data.marble} />
-                        )}
-                        <GrandTotalSection data={data} />
                     </div>
                 </div>
             </div>
@@ -381,10 +391,11 @@ const ContractPreview = ({ data = {} }) => {
             <div className="contract-page page-2-pricing">
                 <div className="contract-main-content">
                     <div className="contract-content-body">
+                        {data.marble && (data.marble.type || data.marble.total > 0) && (
+                            <MarbleTable marble={data.marble} />
+                        )}
+                        <GrandTotalSection data={data} />
                         <PaymentSplitsSection data={data} />
-                    </div>
-                    <div className="signatures-wrapper">
-                        <SignaturesSection showTerms={true} />
                     </div>
                 </div>
             </div>

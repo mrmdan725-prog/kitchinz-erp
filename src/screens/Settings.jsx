@@ -11,7 +11,9 @@ import {
     Lock,
     User,
     Building,
-    Check
+    Check,
+    Eye,
+    EyeOff
 } from 'lucide-react';
 
 const SettingsScreen = () => {
@@ -22,6 +24,7 @@ const SettingsScreen = () => {
     const [newUser, setNewUser] = useState({ name: '', username: '', password: '', role: 'engineer', permissions: { ...defaultPermissions } });
     const [tempSettings, setTempSettings] = useState(systemSettings);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleSaveSettings = (e) => {
         e.preventDefault();
@@ -302,13 +305,35 @@ const SettingsScreen = () => {
                                 <div className="form-group">
                                     <label>كلمة المرور</label>
                                     <div className="input-with-icon">
-                                        <Lock size={16} />
                                         <input
                                             required
-                                            type="password"
+                                            type={showPassword ? 'text' : 'password'}
                                             value={newUser.password}
                                             onChange={e => setNewUser({ ...newUser, password: e.target.value })}
+                                            style={{ paddingRight: '40px', paddingLeft: '40px' }}
                                         />
+                                        <div style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', display: 'flex', color: 'var(--text-secondary)' }}>
+                                            <Lock size={16} />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            style={{
+                                                position: 'absolute',
+                                                left: '12px',
+                                                top: '50%',
+                                                transform: 'translateY(-50%)',
+                                                background: 'none',
+                                                border: 'none',
+                                                color: 'var(--text-secondary)',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                padding: 0
+                                            }}
+                                        >
+                                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -347,7 +372,7 @@ const SettingsScreen = () => {
                             </div>
 
                             <div className="modal-actions">
-                                <button type="button" className="btn-secondary" onClick={() => { setShowUserModal(false); setEditMode(false); }}>إلغاء</button>
+                                <button type="button" className="btn-secondary" onClick={() => { setShowUserModal(false); setEditMode(false); setShowPassword(false); }}>إلغاء</button>
                                 <button type="submit" className="btn-primary">{editMode ? 'تحديث البيانات' : 'حفظ المستخدم'}</button>
                             </div>
                         </form>
@@ -487,13 +512,13 @@ const SettingsScreen = () => {
                 }
                 .input-with-icon svg {
                     position: absolute;
-                    left: 12px;
+                    right: 12px;
                     top: 50%;
                     transform: translateY(-50%);
                     color: var(--text-secondary);
                 }
                 .input-with-icon input {
-                    padding-left: 40px !important;
+                    padding-right: 40px !important;
                 }
                 .btn-small {
                     padding: 8px 16px;
