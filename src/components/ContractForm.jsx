@@ -16,6 +16,7 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData, isEditing: i
 
             // Wood Type Table (fixed categories)
             woodSpecs: [
+                { label: 'الضلف الخارجية', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' },
                 { label: 'الضلف السفلية', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' },
                 { label: 'الضلف العلوية', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' },
                 { label: 'البلاكار ( إن وجد )', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' },
@@ -41,6 +42,9 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData, isEditing: i
             accessories: [],
             accessoriesTotal: '0',
 
+            // Marble
+            marble: { type: '', area: '', price: '', total: '0' },
+
             grandTotal: '0',
             amountInWords: '',
 
@@ -56,11 +60,18 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData, isEditing: i
             // Map 'dimensions' to 'woodSpecs' if needed
             if (!base.woodSpecs && base.dimensions) {
                 base.woodSpecs = [
+                    { label: 'الضلف الخارجية', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' },
                     { label: 'الضلف السفلية', type: base.dimensions[0]?.type || '', totalArea: base.dimensions[0]?.totalArea || '', pricePerMeter: base.dimensions[0]?.pricePerMeter || '', totalPrice: base.dimensions[0]?.totalPrice || '0' },
                     { label: 'الضلف العلوية', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' },
                     { label: 'البلاكار ( إن وجد )', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' },
                     { label: 'التجاليد ( إن وجد )', type: '', totalArea: '', pricePerMeter: '', totalPrice: '0' }
                 ];
+            } else if (base.woodSpecs) {
+                // Merge with defaults to ensure new fields like "External Doors" show up in old contracts
+                base.woodSpecs = defaults.woodSpecs.map(defSpec => {
+                    const existing = base.woodSpecs.find(w => w.label && (w.label === defSpec.label || w.label.includes(defSpec.label.replace('إن', 'ان').trim())));
+                    return existing || defSpec;
+                });
             }
 
             // Ensure components object exists
@@ -83,7 +94,8 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData, isEditing: i
     useEffect(() => {
         const woodSum = formData.woodSpecs.reduce((acc, w) => acc + (parseFloat(w.totalPrice) || 0), 0);
         const accSum = formData.accessories.reduce((acc, a) => acc + (parseFloat(a.total) || 0), 0);
-        const totalValue = woodSum + accSum;
+        const marbleSum = parseFloat(formData.marble?.total || 0);
+        const totalValue = woodSum + accSum + marbleSum;
 
         setFormData(prev => ({
             ...prev,
@@ -94,7 +106,7 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData, isEditing: i
             operation: Math.round(totalValue * 0.3).toString(),
             delivery: Math.round(totalValue * 0.1).toString()
         }));
-    }, [formData.woodSpecs, formData.accessories]);
+    }, [formData.woodSpecs, formData.accessories, formData.marble]);
 
     const handleWoodChange = (index, field, value) => {
         const newWood = [...formData.woodSpecs];
@@ -112,6 +124,14 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData, isEditing: i
             newAccs[index].total = (parseFloat(newAccs[index].price || 0) * parseFloat(newAccs[index].count || 0)).toString();
         }
         setFormData({ ...formData, accessories: newAccs });
+    };
+
+    const handleMarbleChange = (field, value) => {
+        const newMarble = { ...formData.marble, [field]: value };
+        if (field === 'price' || field === 'area') {
+            newMarble.total = (parseFloat(newMarble.price || 0) * parseFloat(newMarble.area || 0)).toString();
+        }
+        setFormData({ ...formData, marble: newMarble });
     };
 
     const handleAddAccessory = () => {
@@ -423,7 +443,45 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData, isEditing: i
                     </div>
                 </div>
 
-                {/* 5. Financials Card */}
+                {/* 5. Marble Card */}
+                <div className="form-card">
+                    <div className="card-header">
+                        <span className="card-icon">🪨</span>
+                        <span className="card-title">بند الرخام</span>
+                    </div>
+                    <div className="card-body">
+                        <div className="premium-form-table-container">
+                            <table className="premium-form-table">
+                                <thead>
+                                    <tr>
+                                        <th>النوع</th>
+                                        <th style={{ width: '120px' }}>عدد الأمتار</th>
+                                        <th style={{ width: '150px' }}>سعر المتر</th>
+                                        <th style={{ width: '150px' }}>الإجمالي</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <input 
+                                                className="inner-table-input" 
+                                                type="text" 
+                                                placeholder="نوع الرخام (مثال: جلاكسي, دبل بلاك...)"
+                                                value={formData.marble?.type || ''} 
+                                                onChange={e => handleMarbleChange('type', e.target.value)} 
+                                            />
+                                        </td>
+                                        <td><input className="inner-table-input numeric" type="number" value={formData.marble?.area || ''} onChange={e => handleMarbleChange('area', e.target.value)} /></td>
+                                        <td><input className="inner-table-input numeric" type="number" value={formData.marble?.price || ''} onChange={e => handleMarbleChange('price', e.target.value)} /></td>
+                                        <td><input className="inner-table-input numeric result-field" disabled type="text" value={formData.marble?.total || '0'} /></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 6. Financials Card */}
                 <div className="form-card financial-card">
                     <div className="card-header">
                         <span className="card-icon">💰</span>

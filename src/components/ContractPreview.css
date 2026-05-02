@@ -475,7 +475,6 @@
     .table-side-label,
     .total-amount-tag,
     .payment-tab-header,
-    .total-row-highlight td,
     .terms-header-text,
     .canva-sig-box,
     .side-label-text {
@@ -500,8 +499,7 @@
 
     .title-green-box *,
     .table-side-label *,
-    .canva-sig-box *,
-    .total-row-highlight td * {
+    .canva-sig-box * {
         background-color: transparent !important;
         background: transparent !important;
     }

@@ -91,12 +91,14 @@ const SpecificationsTable = ({ woodSpecs = [] }) => {
                 </thead>
                 <tbody>
                     {[
+                        'الضلف الخارجية',
                         'الضلف السفلية',
                         'الضلف العلوية',
-                        'البلاكار ( ان وجد )',
-                        'التجاليد ( ان وجد )'
+                        'البلاكار ( إن وجد )',
+                        'التجاليد ( إن وجد )'
                     ].map((label, idx) => {
-                        const wood = woodSpecs[idx] || {};
+                        // Find by exact or partial label match to handle legacy spelling
+                        const wood = woodSpecs.find(w => w.label && (w.label === label || w.label.includes(label.replace('إن', 'ان').trim()) || w.label.includes(label.replace('ان', 'إن').trim()))) || {};
                         return (
                             <tr key={idx}>
                                 <td style={{ textAlign: 'right', fontWeight: 'bold' }} contentEditable={true} suppressContentEditableWarning={true}>{label}</td>
@@ -192,10 +194,37 @@ const AccessoriesTable = ({ accessories = [] }) => {
     );
 };
 
+const MarbleTable = ({ marble = {} }) => {
+    return (
+        <div className="table-wrapper-with-label">
+            <div className="table-side-label"><div className="side-label-text">بند الرخام</div></div>
+            <table className="contract-table">
+                <thead>
+                    <tr>
+                        <th>النوع</th>
+                        <th>عدد الأمتار</th>
+                        <th>سعر المتر</th>
+                        <th>الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td contentEditable={true} suppressContentEditableWarning={true}>{marble.type || ''}</td>
+                        <td contentEditable={true} suppressContentEditableWarning={true}>{marble.area || ''}</td>
+                        <td contentEditable={true} suppressContentEditableWarning={true}>{marble.price || ''}</td>
+                        <td contentEditable={true} suppressContentEditableWarning={true}>{marble.total || '0'}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
 const GrandTotalSection = ({ data }) => {
     const woodTotal = (data.woodSpecs || []).reduce((sum, item) => sum + (Number(item.totalPrice) || 0), 0);
     const accTotal = (data.accessories || []).reduce((sum, item) => sum + (Number(item.total) || 0), 0);
-    const calculatedGrandTotal = woodTotal + accTotal;
+    const marbleTotal = Number(data.marble?.total) || 0;
+    const calculatedGrandTotal = woodTotal + accTotal + marbleTotal;
 
     return (
         <div className="footer-pricing-area" style={{ marginTop: '10px' }}>
@@ -212,7 +241,8 @@ const GrandTotalSection = ({ data }) => {
 const PaymentSplitsSection = ({ data }) => {
     const woodTotal = (data.woodSpecs || []).reduce((sum, item) => sum + (Number(item.totalPrice) || 0), 0);
     const accTotal = (data.accessories || []).reduce((sum, item) => sum + (Number(item.total) || 0), 0);
-    const calculatedGrandTotal = woodTotal + accTotal;
+    const marbleTotal = Number(data.marble?.total) || 0;
+    const calculatedGrandTotal = woodTotal + accTotal + marbleTotal;
 
     return (
         <div className="footer-pricing-area">
@@ -339,6 +369,9 @@ const ContractPreview = ({ data = {} }) => {
                         <SpecificationsTable woodSpecs={data.woodSpecs} />
                         <InternalComponentsTable components={data.components} />
                         <AccessoriesTable accessories={data.accessories} />
+                        {data.marble && (data.marble.type || data.marble.total > 0) && (
+                            <MarbleTable marble={data.marble} />
+                        )}
                         <GrandTotalSection data={data} />
                     </div>
                 </div>
