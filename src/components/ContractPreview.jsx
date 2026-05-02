@@ -43,10 +43,7 @@ const ContractHeader = ({ data, dayName, formattedDate }) => (
                 <div style={{ flex: 1 }}>
                     <span style={{ fontWeight: '400' }}>ويمثلها السيد / </span>
                     <span className="p-text-long" contentEditable={true} suppressContentEditableWarning={true}>{data.representative || ''}</span>
-                </div>
-                <div style={{ width: '300px', textAlign: 'left' }}>
-                    <span style={{ fontWeight: '400' }}>( طرف اول ) رقم قومي </span>
-                    <span className="p-text" contentEditable={true} suppressContentEditableWarning={true}>{data.firstPartyNationalId || ''}</span>
+                    <span style={{ fontWeight: '400', marginRight: '10px' }}> ( طرف اول ) </span>
                 </div>
             </div>
 
@@ -54,10 +51,7 @@ const ContractHeader = ({ data, dayName, formattedDate }) => (
                 <div style={{ flex: 1 }}>
                     <span style={{ fontWeight: '400' }}>والسيد / </span>
                     <span className="p-text-long" contentEditable={true} suppressContentEditableWarning={true}>{data.customer?.name || ''}</span>
-                </div>
-                <div style={{ width: '300px', textAlign: 'left' }}>
-                    <span style={{ fontWeight: '400' }}>( طرف ثاني ) رقم قومي </span>
-                    <span className="p-text" contentEditable={true} suppressContentEditableWarning={true}>{data.customerNationalId || ''}</span>
+                    <span style={{ fontWeight: '400', marginRight: '10px' }}> ( طرف ثاني ) </span>
                 </div>
             </div>
 

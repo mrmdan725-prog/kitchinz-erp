@@ -150,18 +150,7 @@ const SettingsScreen = () => {
                                             />
                                         </div>
                                     </div>
-                                    <div className="form-group">
-                                        <label>الرقم القومي للممثل</label>
-                                        <div className="input-with-icon">
-                                            <Shield size={16} />
-                                            <input
-                                                type="text"
-                                                value={tempSettings.representativeNationalId || ''}
-                                                onChange={e => setTempSettings({ ...tempSettings, representativeNationalId: e.target.value })}
-                                            />
-                                        </div>
                                     </div>
-                                </div>
                                 <div className="form-group" style={{ marginTop: '10px' }}>
                                     <label>عنوان المقر</label>
                                     <textarea

@@ -214,8 +214,7 @@ export const AppProvider = ({ children }) => {
                 address: 'العاشر من رمضان، مصر',
                 phone: '01012345678',
                 inspectionFee: 500,
-                representativeName: '',
-                representativeNationalId: ''
+                representativeName: ''
             };
         } catch (e) {
             console.error("Failed to parse settings from localStorage:", e);
@@ -226,8 +225,7 @@ export const AppProvider = ({ children }) => {
                 address: 'العاشر من رمضان، مصر',
                 phone: '01012345678',
                 inspectionFee: 500,
-                representativeName: '',
-                representativeNationalId: ''
+                representativeName: ''
             };
         }
     });

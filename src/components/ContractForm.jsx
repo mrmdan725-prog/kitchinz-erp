@@ -11,9 +11,7 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData, isEditing: i
         const defaults = {
             contractDate: new Date().toISOString().split('T')[0],
             representative: systemSettings.representativeName || '',
-            firstPartyNationalId: systemSettings.representativeNationalId || '',
             customer: customers[0] || null,
-            customerNationalId: '',
             projectType: '',
 
             // Wood Type Table (fixed categories)
@@ -73,7 +71,6 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData, isEditing: i
             // Sync project type and national ID if customer is provided but fields are empty
             if (base.customer) {
                 if (!base.projectType) base.projectType = base.customer.projectType || '';
-                if (!base.customerNationalId) base.customerNationalId = base.customer.nationalId || '';
             }
 
             return base;
@@ -186,10 +183,6 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData, isEditing: i
                                     <label>ويمثلها السيد /</label>
                                     <input type="text" value={formData.representative} onChange={e => setFormData({ ...formData, representative: e.target.value })} placeholder="اسم ممثل الشركة" />
                                 </div>
-                                <div className="field-group">
-                                    <label>( طرف أول ) رقم قومي</label>
-                                    <input type="text" value={formData.firstPartyNationalId} onChange={e => setFormData({ ...formData, firstPartyNationalId: e.target.value })} placeholder="00000000000000" />
-                                </div>
                             </div>
 
                             <div className="mimic-edit-row">
@@ -203,18 +196,13 @@ const ContractForm = ({ customers, onSubmit, onCancel, initialData, isEditing: i
                                             setFormData({
                                                 ...formData,
                                                 customer,
-                                                projectType: customer?.projectType || formData.projectType,
-                                                customerNationalId: customer?.nationalId || formData.customerNationalId
+                                                projectType: customer?.projectType || formData.projectType
                                             });
                                         }}
                                     >
                                         <option value="">اختر العميل...</option>
                                         {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                     </select>
-                                </div>
-                                <div className="field-group">
-                                    <label>( طرف ثاني ) رقم قومي</label>
-                                    <input type="text" value={formData.customerNationalId} onChange={e => setFormData({ ...formData, customerNationalId: e.target.value })} placeholder="00000000000000" />
                                 </div>
                             </div>
 
